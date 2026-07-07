@@ -1,0 +1,6 @@
+{
+  "name": "archivist",
+  "tree": {
+    "$path": "dist"
+  }
+}

@@ -1,0 +1,6 @@
+/Packages
+/dist
+/build-tmp
+/sourcemap*.json
+*.rbxm
+package.zip

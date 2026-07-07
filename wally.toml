@@ -1,0 +1,15 @@
+[package]
+name = "flipbook-labs/archivist"
+version = "0.1.0"
+license = "MIT"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+include = [
+	"dist",
+	"dist/**/*",
+	"LICENSE",
+	"README.md",
+	"default.project.json",
+	"wally.toml",
+]
+exclude = ["*"]
