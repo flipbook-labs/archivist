@@ -1,4 +1,3 @@
---!strict
 --[[
 	Appends formatted records to a log file, one per line. Lute only: the
 	constructor errors on runtimes without a filesystem (Roblox), which is a

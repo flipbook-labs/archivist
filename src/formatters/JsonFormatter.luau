@@ -1,4 +1,3 @@
---!strict
 --[[
 	Machine-readable, one-JSON-object-per-line formatter for file sinks and
 	transports:

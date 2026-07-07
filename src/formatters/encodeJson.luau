@@ -1,4 +1,3 @@
---!strict
 --[[
 	A small, portable JSON encoder.
 

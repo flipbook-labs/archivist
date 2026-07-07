@@ -1,4 +1,3 @@
---!strict
 --[[
 	Hands every `LogRecord` to a user function — the escape hatch for anything
 	the built-in sinks don't cover, e.g. feeding an in-app log viewer:

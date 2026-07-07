@@ -1,4 +1,3 @@
---!strict
 --[[
 	Buffered base for shipping records to external destinations (logging
 	platforms, HTTP ingest endpoints, analytics).
