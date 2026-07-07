@@ -2,19 +2,24 @@
 --[[
 	Roblox implementation of the `Platform` seam.
 
-	Uses only Roblox globals (`print`, `warn`, `os.time`). The Roblox build swaps
-	this in for `platform/init.luau`; see `.lute/build.luau`.
+	Uses only Roblox globals (`print`, `warn`, `task`, `os.time`). The Roblox
+	build swaps this in for `platform/init.luau`; see `.lute/build.luau`.
+
+	selene lints against the plain Luau std and cannot see Roblox globals, hence
+	the targeted allows below.
 ]]
 
 local types = require("@root/platform/types")
+
+-- `holdForFlush` is called once per batch window but `game:BindToClose` has no
+-- unbind, so bind each distinct flush function only once for the session.
+local boundFlushes: { [() -> ()]: boolean } = {}
 
 local platform: types.Platform = {
 	write = function(line)
 		print(line)
 	end,
 	warn = function(line)
-		-- This module only ever runs on Roblox, where `warn` is a global; selene
-		-- lints against the plain Luau std and cannot see it.
 		-- selene: allow(undefined_variable)
 		warn(line)
 	end,
@@ -23,6 +28,27 @@ local platform: types.Platform = {
 		return nil
 	end,
 	color = false,
+	defer = function(callback)
+		-- selene: allow(undefined_variable)
+		task.defer(callback)
+	end,
+	holdForFlush = function(flush)
+		-- Roblox has no process to hold open and nothing to unregister, so this
+		-- is best-effort: bind `flush` to DataModel close where available
+		-- (`game:BindToClose` is server-only; plugins and clients skip it).
+		-- Batches on Roblox flush every defer cycle regardless, so little is
+		-- ever pending at shutdown.
+		-- selene: allow(undefined_variable)
+		if not boundFlushes[flush] and typeof(game) == "Instance" then
+			boundFlushes[flush] = true
+			pcall(function()
+				-- selene: allow(undefined_variable, incorrect_standard_library_use)
+				game:BindToClose(flush)
+			end)
+		end
+
+		return function() end
+	end,
 }
 
 return platform

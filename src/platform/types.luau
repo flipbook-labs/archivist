@@ -21,6 +21,15 @@ export type Platform = {
 	getEnv: (key: string) -> string?,
 	-- Whether ANSI colour codes are meaningful on this runtime's output.
 	color: boolean,
+	-- Schedules `callback` to run soon, after the current execution finishes
+	-- (Lute/Roblox `task.defer`). Used to coalesce batched log writes.
+	defer: (callback: () -> ()) -> (),
+	-- Called while batched records are pending: `flush` must run if the process
+	-- is about to terminate (interrupt, shutdown). Returns a release function
+	-- the caller invokes once the pending batch has drained. On Lute the
+	-- registered signal handles hold the event loop open, so releasing promptly
+	-- is what lets the process exit naturally.
+	holdForFlush: (flush: () -> ()) -> () -> (),
 }
 
 return {}

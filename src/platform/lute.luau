@@ -9,6 +9,7 @@
 
 local io = require("@lute/io")
 local process = require("@lute/process")
+local task = require("@lute/task")
 
 local types = require("@root/platform/types")
 
@@ -28,6 +29,29 @@ local platform: types.Platform = {
 		return value
 	end,
 	color = true,
+	defer = function(callback)
+		task.defer(callback)
+	end,
+	holdForFlush = function(flush)
+		-- `process.onSignal` suppresses the default terminate behavior, so exit
+		-- manually after flushing. 130/143 are the conventional exit codes for
+		-- SIGINT/SIGTERM. The live handles also keep the event loop open, which
+		-- is exactly the hold semantics we want — and why they must be closed
+		-- once the batch drains.
+		local sigint = process.onSignal("SIGINT", function()
+			flush()
+			process.exit(130)
+		end)
+		local sigterm = process.onSignal("SIGTERM", function()
+			flush()
+			process.exit(143)
+		end)
+
+		return function()
+			sigint:close()
+			sigterm:close()
+		end
+	end,
 }
 
 return platform

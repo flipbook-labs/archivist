@@ -38,6 +38,10 @@ run({ "darklua", "process", "src", "dist" })
 -- 3. Realise the platform seam for Roblox. Post-darklua the tree uses Roblox
 --    require syntax, so the swapped seam references its sibling directly.
 run({ "rm", "-f", "dist/platform/lute.luau" })
+
+-- Tests and test helpers don't ship in the Roblox package.
+run({ "sh", "-c", "find dist -name '*.test.luau' -delete" })
+run({ "rm", "-rf", "dist/testing" })
 writeFile(
 	"dist/platform/init.luau",
 	"-- Roblox build: the platform seam resolves to the Roblox implementation.\nreturn require(script.roblox)\n"
