@@ -19,7 +19,9 @@ local platform: types.Platform = {
 	warn = function(line)
 		io.write(line .. "\n")
 	end,
-	now = os.time,
+	now = function()
+		return os.time()
+	end,
 	getEnv = function(key)
 		local value = process.env[key]
 		if value == "" then
