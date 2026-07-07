@@ -1,4 +1,3 @@
---!strict
 --[[
 	Archivist — a structured logging library for Luau that runs on both Lute
 	and Roblox.

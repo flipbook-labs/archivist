@@ -1,4 +1,3 @@
---!strict
 --[[
 	A test sink that records every batch and record it receives.
 

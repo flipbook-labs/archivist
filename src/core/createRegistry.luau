@@ -1,4 +1,3 @@
---!strict
 --[[
 	Caches loggers by name so `getLogger("X")` returns the same instance across
 	modules — the cheap way for a codebase to share one configured logger

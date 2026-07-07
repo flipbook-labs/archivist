@@ -1,4 +1,3 @@
---!strict
 --[[
 	Writes records to the runtime's console: stdout on Lute, the Output window
 	on Roblox. `trace`/`debug`/`info` go through `platform.write` (print);

@@ -1,4 +1,3 @@
---!strict
 --[[
 	Log levels and their severity ordering.
 
