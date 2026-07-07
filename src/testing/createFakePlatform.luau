@@ -33,40 +33,41 @@ local function createFakePlatform(): FakePlatform
 	local deferred: { () -> () } = {}
 	local now = 1750000000
 
-	local fake: FakePlatform
-	fake = {
-		platform = {
-			write = function(line)
-				table.insert(written, line)
-			end,
-			warn = function(line)
-				table.insert(warned, line)
-			end,
-			now = function()
-				return now
-			end,
-			getEnv = function(key)
-				return env[key]
-			end,
-			color = false,
-			defer = function(callback)
-				table.insert(deferred, callback)
-			end,
-			holdForFlush = function(flush)
-				table.insert(holds, flush)
-				return function()
-					released += 1
-				end
-			end,
-		},
+	local platform: types.Platform = {
+		write = function(line)
+			table.insert(written, line)
+		end,
+		warn = function(line)
+			table.insert(warned, line)
+		end,
+		now = function()
+			return now
+		end,
+		getEnv = function(key): string?
+			return env[key]
+		end,
+		color = false,
+		defer = function(callback)
+			table.insert(deferred, callback)
+		end,
+		holdForFlush = function(flush)
+			table.insert(holds, flush)
+			return function()
+				released += 1
+			end
+		end,
+	}
+
+	local fake: FakePlatform = {
+		platform = platform,
 		written = written,
 		warned = warned,
 		env = env,
 		holds = holds,
-		releasedCount = function()
+		releasedCount = function(): number
 			return released
 		end,
-		runDeferred = function()
+		runDeferred = function(): number
 			local toRun = deferred
 			deferred = {}
 			for _, callback in toRun do
@@ -74,7 +75,7 @@ local function createFakePlatform(): FakePlatform
 			end
 			return #toRun
 		end,
-		setNow = function(timestamp)
+		setNow = function(timestamp: number)
 			now = timestamp
 		end,
 	}

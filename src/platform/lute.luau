@@ -2,14 +2,14 @@
 --[[
 	Lute implementation of the `Platform` seam.
 
-	This module requires `@lute/*` builtins and therefore MUST NOT be reachable
-	from the Roblox build (see `.lute/build.luau`, which excludes it and swaps
-	`platform/init.luau` for the Roblox implementation).
+	This module requires Lute's `@std/*` libraries and therefore MUST NOT be
+	reachable from the Roblox build (see `.lute/build.luau`, which excludes it
+	and swaps `platform/init.luau` for the Roblox implementation).
 ]]
 
-local io = require("@lute/io")
-local process = require("@lute/process")
-local task = require("@lute/task")
+local io = require("@std/io")
+local process = require("@std/process")
+local task = require("@std/task")
 
 local types = require("@root/platform/types")
 
@@ -20,7 +20,9 @@ local platform: types.Platform = {
 	warn = function(line)
 		io.write(line .. "\n")
 	end,
-	now = os.time,
+	now = function()
+		return os.time()
+	end,
 	getEnv = function(key)
 		local value = process.env[key]
 		if value == "" then

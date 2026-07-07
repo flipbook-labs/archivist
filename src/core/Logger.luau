@@ -80,8 +80,7 @@ local function createLogger(
 		dispatcher.dispatch(sinks, record, currentMode)
 	end
 
-	local logger: Logger
-	logger = {
+	local logger: Logger = {
 		trace = function(...)
 			emit("trace", ...)
 		end,

@@ -23,7 +23,9 @@ local platform: types.Platform = {
 		-- selene: allow(undefined_variable)
 		warn(line)
 	end,
-	now = os.time,
+	now = function()
+		return os.time()
+	end,
 	getEnv = function(_key)
 		return nil
 	end,
