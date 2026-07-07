@@ -1,4 +1,3 @@
---!strict
 --[[
 	Minimal logger used to prove the platform seam (Stage 1 spike).
 

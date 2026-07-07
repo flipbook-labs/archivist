@@ -16,13 +16,15 @@ local project = require("@repo/project")
 
 local globalDefsPath = tostring(path.join(system.tmpdir(), "globalTypes.d.luau"))
 
+-- Keep the ref in sync with the luau-lsp version pinned in rokit.toml.
+local LUAU_LSP_VERSION = "1.68.1"
+
 run({
 	"curl",
-	"-s",
+	"-sSf",
 	"-o",
 	globalDefsPath,
-	"-O",
-	"https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/master/scripts/globalTypes.d.lua",
+	`https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/{LUAU_LSP_VERSION}/scripts/globalTypes.d.lua`,
 })
 
 -- Lute flavor: everything except the Roblox platform implementation. The
