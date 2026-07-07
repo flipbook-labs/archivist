@@ -7,6 +7,7 @@
 	and swaps `platform/init.luau` for the Roblox implementation).
 ]]
 
+local fs = require("@std/fs")
 local io = require("@std/io")
 local process = require("@std/process")
 local task = require("@std/task")
@@ -53,6 +54,17 @@ local platform: types.Platform = {
 			sigint:close()
 			sigterm:close()
 		end
+	end,
+	openAppendable = function(path)
+		local handle = fs.open(path, "a")
+		return {
+			append = function(text)
+				fs.write(handle, text)
+			end,
+			close = function()
+				fs.close(handle)
+			end,
+		}
 	end,
 }
 

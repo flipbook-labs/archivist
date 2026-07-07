@@ -10,6 +10,12 @@
 
 export type LogLevel = "trace" | "debug" | "info" | "warn" | "err"
 
+-- A handle to a file opened for appending; see `Platform.openAppendable`.
+export type AppendHandle = {
+	append: (text: string) -> (),
+	close: () -> (),
+}
+
 export type Platform = {
 	-- Writes a line to standard output (Lute `io.write` / Roblox `print`).
 	write: (line: string) -> (),
@@ -30,6 +36,9 @@ export type Platform = {
 	-- registered signal handles hold the event loop open, so releasing promptly
 	-- is what lets the process exit naturally.
 	holdForFlush: (flush: () -> ()) -> () -> (),
+	-- Opens `path` for appending (creating it if absent). Absent on runtimes
+	-- with no filesystem (Roblox) — capability-probe before use.
+	openAppendable: ((path: string) -> AppendHandle)?,
 }
 
 return {}

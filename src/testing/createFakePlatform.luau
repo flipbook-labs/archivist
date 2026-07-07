@@ -15,6 +15,10 @@ export type FakePlatform = {
 	written: { string },
 	warned: { string },
 	env: { [string]: string },
+	-- In-memory filesystem backing `openAppendable`: path -> appended chunks.
+	files: { [string]: { string } },
+	-- Paths whose append handles have been closed.
+	closedFiles: { [string]: boolean },
 	-- Flush callbacks captured from `holdForFlush`, in registration order.
 	holds: { () -> () },
 	-- How many holds have been released so far.
@@ -28,6 +32,8 @@ local function createFakePlatform(): FakePlatform
 	local written: { string } = {}
 	local warned: { string } = {}
 	local env: { [string]: string } = {}
+	local files: { [string]: { string } } = {}
+	local closedFiles: { [string]: boolean } = {}
 	local holds: { () -> () } = {}
 	local released = 0
 	local deferred: { () -> () } = {}
@@ -56,6 +62,18 @@ local function createFakePlatform(): FakePlatform
 				released += 1
 			end
 		end,
+		openAppendable = function(path)
+			local chunks = files[path] or {}
+			files[path] = chunks
+			return {
+				append = function(text)
+					table.insert(chunks, text)
+				end,
+				close = function()
+					closedFiles[path] = true
+				end,
+			}
+		end,
 	}
 
 	local fake: FakePlatform = {
@@ -63,6 +81,8 @@ local function createFakePlatform(): FakePlatform
 		written = written,
 		warned = warned,
 		env = env,
+		files = files,
+		closedFiles = closedFiles,
 		holds = holds,
 		releasedCount = function(): number
 			return released

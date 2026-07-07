@@ -64,6 +64,38 @@ batched.flush() -- optional; pending batches also flush on defer and at exit
 local verbose = Archivist.createLogger("MyModule", { level = "trace" })
 ```
 
+### Sinks
+
+```luau
+local logger = Archivist.createLogger("App", {
+	sinks = {
+		-- The runtime's console: colored stdout on Lute, print/warn on Roblox.
+		Archivist.ConsoleSink(),
+
+		-- Any custom destination — e.g. an in-app log viewer panel:
+		Archivist.CallbackSink(function(record)
+			LogsStore.addLine(record)
+		end),
+
+		-- A JSON-lines log file (Lute only):
+		Archivist.FileSink({ path = "logs/app.log" }),
+
+		-- Ship batches to an external platform; bring your own HTTP client:
+		Archivist.TransportSink({
+			batchSize = 50,
+			send = function(records)
+				httpClient.post(INGEST_URL, records)
+			end,
+		}),
+	},
+})
+```
+
+Formatters control how text-oriented sinks render records: `PrettyFormatter`
+(human-readable, optional ANSI color) and `JsonFormatter` (one JSON object per
+line). Sinks that consume records structurally (CallbackSink, TransportSink)
+bypass formatting entirely.
+
 The minimum level resolves from, in order: the `level` option, the `LOG_LEVEL`
 environment variable (Lute), `_G.LOG_LEVEL` (Roblox), then defaults to `info`.
 

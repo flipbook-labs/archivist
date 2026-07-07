@@ -138,6 +138,14 @@ local function createLogger(
 
 		flush = function()
 			dispatcher.flush()
+			-- Also flush this logger's sinks directly: in dev mode nothing
+			-- queues in the dispatcher, but sinks like TransportSink still
+			-- buffer internally.
+			for _, sink in sinks do
+				if sink.flush then
+					sink.flush()
+				end
+			end
 		end,
 	}
 

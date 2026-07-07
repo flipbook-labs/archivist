@@ -78,6 +78,14 @@ local function createDispatcher(platform: types.Platform): Dispatcher
 		for _, sink in sinkOrder do
 			sink.write(sinkBatches[sink])
 		end
+
+		-- Propagate to sinks that buffer across batches (e.g. TransportSink),
+		-- so an exit-time drain also pushes their buffers out.
+		for _, sink in sinkOrder do
+			if sink.flush then
+				sink.flush()
+			end
+		end
 	end
 
 	local function dispatch(sinks: { SinkT }, record: LogRecordT, mode: "dev" | "prod")

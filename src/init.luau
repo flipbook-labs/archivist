@@ -12,13 +12,17 @@
 		logger.info("loaded", count, "stories")
 ]]
 
+local CallbackSink = require("@root/sinks/CallbackSink")
 local ConsoleSink = require("@root/sinks/ConsoleSink")
+local FileSink = require("@root/sinks/FileSink")
 local Formatter = require("@root/core/Formatter")
+local JsonFormatter = require("@root/formatters/JsonFormatter")
 local LogLevel = require("@root/core/LogLevel")
 local LogRecord = require("@root/core/LogRecord")
 local Logger = require("@root/core/Logger")
 local PrettyFormatter = require("@root/formatters/PrettyFormatter")
 local Sink = require("@root/core/Sink")
+local TransportSink = require("@root/sinks/TransportSink")
 local createDispatcher = require("@root/core/createDispatcher")
 local createRegistry = require("@root/core/createRegistry")
 local platform = require("@root/platform")
@@ -78,6 +82,10 @@ local function newConsoleSink(options: ConsoleSink.ConsoleSinkOptions?): Sink
 	return ConsoleSink(platform, options)
 end
 
+local function newFileSink(options: FileSink.FileSinkOptions): Sink
+	return FileSink(platform, options)
+end
+
 -- Creates a new, un-cached logger.
 local function createLogger(name: string, options: CreateLoggerOptions?): Logger
 	return Logger(platform, dispatcher, name, {
@@ -100,6 +108,11 @@ return {
 	createLogger = createLogger,
 	getLogger = getLogger,
 
+	CallbackSink = CallbackSink,
 	ConsoleSink = newConsoleSink,
+	FileSink = newFileSink,
+	TransportSink = TransportSink,
+
+	JsonFormatter = JsonFormatter,
 	PrettyFormatter = PrettyFormatter,
 }
