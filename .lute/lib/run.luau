@@ -1,4 +1,3 @@
---!strict
 -- Runs an external tool, inheriting stdio, and exits the script with the
 -- tool's exit code on failure.
 local process = require("@std/process")

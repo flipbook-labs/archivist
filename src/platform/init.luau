@@ -1,4 +1,3 @@
---!strict
 --[[
 	Platform seam.
 

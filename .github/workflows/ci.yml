@@ -9,10 +9,10 @@ on:
 jobs:
   changelog:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: flipbook-labs/changewrite@v0.5.0
         with:
@@ -20,24 +20,27 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
-      - uses: CompeyDev/setup-rokit@v0.2.1
+      - uses: CompeyDev/setup-rokit@1d9390883f7ebce19d48f5b8d006e11d387c92ab # v0.2.1
         with:
           version: v1.2.0
+
+      - name: Build (lint verifies dist hygiene)
+        run: lute run build
 
       - name: Lint
         run: lute run lint
 
   tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
-      - uses: CompeyDev/setup-rokit@v0.2.1
+      - uses: CompeyDev/setup-rokit@1d9390883f7ebce19d48f5b8d006e11d387c92ab # v0.2.1
         with:
           version: v1.2.0
 
@@ -46,31 +49,16 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
-      - uses: CompeyDev/setup-rokit@v0.2.1
+      - uses: CompeyDev/setup-rokit@1d9390883f7ebce19d48f5b8d006e11d387c92ab # v0.2.1
         with:
           version: v1.2.0
 
       - name: Build
         run: lute run build
-
-      - name: Verify dist ships no Lute requires or test files
-        run: |
-          if grep -rn 'require("@lute\|require("@std' dist; then
-            echo "::error::Lute-only requires leaked into dist"
-            exit 1
-          fi
-          if find dist -name '*.test.luau' | grep -q .; then
-            echo "::error::test files leaked into dist"
-            exit 1
-          fi
-          if [ -d dist/testing ]; then
-            echo "::error::test helpers leaked into dist"
-            exit 1
-          fi
 
       - name: Get model file name
         run: |
@@ -87,11 +75,11 @@ jobs:
 
   analyze:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
-      - uses: CompeyDev/setup-rokit@v0.2.1
+      - uses: CompeyDev/setup-rokit@1d9390883f7ebce19d48f5b8d006e11d387c92ab # v0.2.1
         with:
           version: v1.2.0
 

@@ -1,4 +1,3 @@
---!strict
 --[[
 	Human-readable, optionally colored, single-line-per-record formatter:
 

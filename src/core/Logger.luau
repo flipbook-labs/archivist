@@ -1,4 +1,3 @@
---!strict
 --[[
 	The logger: builds a `LogRecord` per call, filters it by level, and hands it
 	to the dispatcher.

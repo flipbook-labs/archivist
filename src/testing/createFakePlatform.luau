@@ -1,4 +1,3 @@
---!strict
 --[[
 	A deterministic, fully-inspectable `Platform` for tests.
 

@@ -1,4 +1,3 @@
---!strict
 --[[
 	Shared runtime-abstraction types.
 

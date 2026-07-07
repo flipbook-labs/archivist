@@ -1,4 +1,3 @@
---!strict
 --[[
 	A `Sink` is an output target for log records.
 

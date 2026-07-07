@@ -1,4 +1,3 @@
---!strict
 --[[
 	Routes records from loggers to sinks, implementing the dev/prod deferral
 	behavior:

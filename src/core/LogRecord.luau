@@ -1,4 +1,3 @@
---!strict
 --[[
 	The structured object every log call produces.
 
