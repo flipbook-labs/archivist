@@ -14,6 +14,19 @@ local types = require("@root/platform/types")
 -- unbind, so bind each distinct flush function only once for the session.
 local boundFlushes: { [() -> ()]: boolean } = {}
 
+-- The Roblox Output window strips ANSI codes, so styles are identity. If
+-- terminal-rendered output ever matters here (e.g. Open Cloud runs), these can
+-- delegate to a chalk-style Wally package instead — Jest-Lua uses
+-- jsdotlua/chalk for exactly that.
+local function identity(text: string): string
+	return text
+end
+
+local function jsonEncode(value: any): string
+	-- selene: allow(undefined_variable)
+	return game:GetService("HttpService"):JSONEncode(value)
+end
+
 local platform: types.Platform = {
 	write = function(line)
 		print(line)
@@ -32,6 +45,26 @@ local platform: types.Platform = {
 		return nil
 	end,
 	color = false,
+	styles = {
+		levels = {
+			trace = identity,
+			debug = identity,
+			info = identity,
+			warn = identity,
+			err = identity,
+		},
+		dim = identity,
+	},
+	inspect = function(value)
+		if type(value) == "table" then
+			local success, encoded = pcall(jsonEncode, value)
+			if success then
+				return encoded
+			end
+		end
+		return tostring(value)
+	end,
+	jsonEncode = jsonEncode,
 	defer = function(callback)
 		-- selene: allow(undefined_variable)
 		task.defer(callback)

@@ -8,11 +8,16 @@
 	human would read them); `args` additionally carries any non-string
 	arguments structurally when present, so transports don't lose data to
 	stringification. `fields` carries the logger's structured context.
+
+	Encoding is the platform's native JSON (Lute @std/json, Roblox
+	HttpService). Records containing unencodable values (functions, cycles)
+	fall back to a stringified payload rather than erroring — a lossy log line
+	beats a crashing logger.
 ]]
 
 local Formatter = require("@root/core/Formatter")
 local LogRecord = require("@root/core/LogRecord")
-local encodeJson = require("@root/formatters/encodeJson")
+local types = require("@root/platform/types")
 
 export type JsonFormatterOptions = {
 	-- Include the raw args array alongside the joined message when any
@@ -20,7 +25,7 @@ export type JsonFormatterOptions = {
 	structuredArgs: boolean?,
 }
 
-local function createJsonFormatter(options: JsonFormatterOptions?): Formatter.Formatter
+local function createJsonFormatter(platform: types.Platform, options: JsonFormatterOptions?): Formatter.Formatter
 	local structuredArgs = if options and options.structuredArgs ~= nil then options.structuredArgs else true
 
 	local function format(record: LogRecord.LogRecord): string
@@ -54,7 +59,20 @@ local function createJsonFormatter(options: JsonFormatterOptions?): Formatter.Fo
 			payload.fields = record.fields
 		end
 
-		return encodeJson(payload)
+		local success, encoded = pcall(platform.jsonEncode, payload)
+		if success then
+			return encoded
+		end
+
+		-- Something in args/fields wasn't encodable; retry with only the
+		-- already-stringified core fields, which always encode.
+		return platform.jsonEncode({
+			timestamp = payload.timestamp,
+			level = payload.level,
+			name = payload.name,
+			message = payload.message,
+			encodeError = true,
+		})
 	end
 
 	return {

@@ -85,6 +85,14 @@ local function newFileSink(options: FileSink.FileSinkOptions): Sink
 	return FileSink(platform, options)
 end
 
+local function newPrettyFormatter(options: PrettyFormatter.PrettyFormatterOptions?): Formatter
+	return PrettyFormatter(platform, options)
+end
+
+local function newJsonFormatter(options: JsonFormatter.JsonFormatterOptions?): Formatter
+	return JsonFormatter(platform, options)
+end
+
 -- Creates a new, un-cached logger.
 local function createLogger(name: string, options: CreateLoggerOptions?): Logger
 	return Logger(platform, dispatcher, name, {
@@ -112,6 +120,6 @@ return {
 	FileSink = newFileSink,
 	TransportSink = TransportSink,
 
-	JsonFormatter = JsonFormatter,
-	PrettyFormatter = PrettyFormatter,
+	JsonFormatter = newJsonFormatter,
+	PrettyFormatter = newPrettyFormatter,
 }

@@ -25,9 +25,7 @@ local function isWarnStream(record: LogRecord.LogRecord): boolean
 end
 
 local function createConsoleSink(platform: types.Platform, options: ConsoleSinkOptions?): Sink.Sink
-	local formatter = if options and options.formatter
-		then options.formatter
-		else PrettyFormatter({ color = platform.color })
+	local formatter = if options and options.formatter then options.formatter else PrettyFormatter(platform)
 
 	local function write(records: { LogRecord.LogRecord })
 		local runLines: { string } = {}

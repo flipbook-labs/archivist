@@ -8,10 +8,21 @@
 
 local fs = require("@std/fs")
 local io = require("@std/io")
+local json = require("@std/json")
+local pp = require("@batteries/pp")
 local process = require("@std/process")
+local richterm = require("@batteries/richterm")
 local task = require("@std/task")
 
 local types = require("@root/platform/types")
+
+-- richterm formatters take an extra optional `nocolor` argument, so they don't
+-- match `Styler` exactly under strict analysis; adapt them.
+local function toStyler(format: richterm.Formatter): types.Styler
+	return function(text)
+		return format(text)
+	end
+end
 
 local platform: types.Platform = {
 	write = function(line)
@@ -34,6 +45,25 @@ local platform: types.Platform = {
 		return value
 	end,
 	color = true,
+	styles = {
+		levels = {
+			trace = toStyler(richterm.gray),
+			debug = toStyler(richterm.cyan),
+			info = toStyler(richterm.green),
+			warn = toStyler(richterm.yellow),
+			err = toStyler(richterm.red),
+		},
+		dim = toStyler(richterm.dim),
+	},
+	inspect = function(value)
+		if type(value) == "table" then
+			return pp(value)
+		end
+		return tostring(value)
+	end,
+	jsonEncode = function(value)
+		return json.serialize(value)
+	end,
 	defer = function(callback)
 		task.defer(callback)
 	end,

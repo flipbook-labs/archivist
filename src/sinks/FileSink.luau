@@ -24,7 +24,7 @@ local function createFileSink(platform: types.Platform, options: FileSinkOptions
 	local openAppendable = platform.openAppendable
 	assert(openAppendable ~= nil, "FileSink is not supported on this runtime: it has no filesystem")
 
-	local formatter = if options.formatter then options.formatter else JsonFormatter()
+	local formatter = if options.formatter then options.formatter else JsonFormatter(platform)
 	local handle: types.AppendHandle? = nil
 
 	local function write(records: { LogRecord.LogRecord })
