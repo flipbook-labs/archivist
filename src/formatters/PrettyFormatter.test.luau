@@ -3,6 +3,7 @@ local test = require("@std/test")
 
 local LogRecord = require("@root/core/LogRecord")
 local PrettyFormatter = require("@root/formatters/PrettyFormatter")
+local createFakePlatform = require("@root/testing/createFakePlatform")
 
 local function record(overrides: {
 	level: ("trace" | "debug" | "info" | "warn" | "err")?,
@@ -20,13 +21,15 @@ end
 
 test.suite("PrettyFormatter", function(suite)
 	suite:case("renders name, level, and message", function()
-		local formatter = PrettyFormatter({ timestamp = false })
+		local fake = createFakePlatform()
+		local formatter = PrettyFormatter(fake.platform, { timestamp = false })
 
 		expect.eq(formatter.format(record({})), "[test] [info ] hello")
 	end)
 
 	suite:case("prefixes a HH:MM:SS timestamp by default", function()
-		local formatter = PrettyFormatter()
+		local fake = createFakePlatform()
+		local formatter = PrettyFormatter(fake.platform)
 
 		local line = formatter.format(record({}))
 
@@ -34,7 +37,8 @@ test.suite("PrettyFormatter", function(suite)
 	end)
 
 	suite:case("joins varargs with spaces, including non-strings", function()
-		local formatter = PrettyFormatter({ timestamp = false })
+		local fake = createFakePlatform()
+		local formatter = PrettyFormatter(fake.platform, { timestamp = false })
 
 		local line = formatter.format(record({ args = table.pack("loaded", 3, true) }))
 
@@ -42,15 +46,17 @@ test.suite("PrettyFormatter", function(suite)
 	end)
 
 	suite:case("renders nil arguments explicitly", function()
-		local formatter = PrettyFormatter({ timestamp = false })
+		local fake = createFakePlatform()
+		local formatter = PrettyFormatter(fake.platform, { timestamp = false })
 
 		local line = formatter.format(record({ args = table.pack("value:", nil) }))
 
 		expect.eq(line, "[test] [info ] value: nil")
 	end)
 
-	suite:case("pretty-prints table arguments", function()
-		local formatter = PrettyFormatter({ timestamp = false })
+	suite:case("pretty-prints table arguments via the platform", function()
+		local fake = createFakePlatform()
+		local formatter = PrettyFormatter(fake.platform, { timestamp = false })
 
 		local line = formatter.format(record({ args = table.pack({ port = 8080 }) }))
 
@@ -58,20 +64,31 @@ test.suite("PrettyFormatter", function(suite)
 	end)
 
 	suite:case("appends fields after the message", function()
-		local formatter = PrettyFormatter({ timestamp = false })
+		local fake = createFakePlatform()
+		local formatter = PrettyFormatter(fake.platform, { timestamp = false })
 
 		local line = formatter.format(record({ fields = { requestId = "abc" } }))
 
 		expect.strContains(line, 'requestId = "abc"')
 	end)
 
-	suite:case("emits ANSI codes only when color is on", function()
-		local plain = PrettyFormatter({ timestamp = false })
-		local colored = PrettyFormatter({ timestamp = false, color = true })
+	suite:case("styles by level only when color is on", function()
+		local fake = createFakePlatform()
+		local plain = PrettyFormatter(fake.platform, { timestamp = false })
+		local colored = PrettyFormatter(fake.platform, { timestamp = false, color = true })
 
-		-- selene: allow(bad_string_escape) -- \x is valid Luau; selene lags here (same as vendor/richterm)
-		expect.never.strContains(plain.format(record({})), "\x1b[")
-		-- selene: allow(bad_string_escape)
-		expect.strContains(colored.format(record({ level = "err" })), "\x1b[31m")
+		-- The fake platform's color is false, so styling defaults off.
+		expect.never.strContains(plain.format(record({})), "<info>")
+		expect.strContains(colored.format(record({ level = "err" })), "<err>[test] [err  ]</err>")
+	end)
+
+	suite:case("dims the timestamp and fields when color is on", function()
+		local fake = createFakePlatform()
+		local formatter = PrettyFormatter(fake.platform, { color = true })
+
+		local line = formatter.format(record({ fields = { a = 1 } }))
+
+		expect.that(string.find(line, "^<dim>%d%d:%d%d:%d%d</dim>") ~= nil, line)
+		expect.strContains(line, "<dim>{")
 	end)
 end)

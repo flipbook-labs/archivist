@@ -77,6 +77,10 @@ local function newConsoleSink(options: ConsoleSink.ConsoleSinkOptions?): Sink
 	return ConsoleSink(platform, options)
 end
 
+local function newPrettyFormatter(options: PrettyFormatter.PrettyFormatterOptions?): Formatter
+	return PrettyFormatter(platform, options)
+end
+
 -- Creates a new, un-cached logger.
 local function createLogger(name: string, options: CreateLoggerOptions?): Logger
 	return Logger(platform, dispatcher, name, {
@@ -100,5 +104,5 @@ return {
 	getLogger = getLogger,
 
 	ConsoleSink = newConsoleSink,
-	PrettyFormatter = PrettyFormatter,
+	PrettyFormatter = newPrettyFormatter,
 }

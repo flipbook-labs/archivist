@@ -5,9 +5,22 @@
 	- `defer` captures callbacks; tests pump them explicitly via `runDeferred`
 	- `now` returns a fixed, settable time
 	- `env` is a plain table backing `getEnv`
+	- `styles` wrap text in `<style>...</style>` markers so assertions can
+	  check that (and which) styling was applied without ANSI escapes
+	- `inspect`/`jsonEncode` use the real Lute implementations (this helper
+	  only ever runs under `lute test`; it never ships to Roblox)
 ]]
 
+local json = require("@std/json")
+local pp = require("@batteries/pp")
+
 local types = require("@root/platform/types")
+
+local function marker(name: string): types.Styler
+	return function(text)
+		return `<{name}>{text}</{name}>`
+	end
+end
 
 export type FakePlatform = {
 	platform: types.Platform,
@@ -46,6 +59,25 @@ local function createFakePlatform(): FakePlatform
 			return env[key]
 		end,
 		color = false,
+		styles = {
+			levels = {
+				trace = marker("trace"),
+				debug = marker("debug"),
+				info = marker("info"),
+				warn = marker("warn"),
+				err = marker("err"),
+			},
+			dim = marker("dim"),
+		},
+		inspect = function(value)
+			if type(value) == "table" then
+				return pp(value)
+			end
+			return tostring(value)
+		end,
+		jsonEncode = function(value)
+			return json.serialize(value)
+		end,
 		defer = function(callback)
 			table.insert(deferred, callback)
 		end,
