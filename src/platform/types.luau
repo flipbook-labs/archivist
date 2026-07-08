@@ -56,7 +56,7 @@ export type Platform = {
 	-- is what lets the process exit naturally.
 	holdForFlush: (flush: () -> ()) -> () -> (),
 	-- Opens `path` for appending (creating it if absent). Absent on runtimes
-	-- with no filesystem (Roblox) — capability-probe before use.
+	-- with no filesystem (Roblox), so capability-probe before use.
 	openAppendable: ((path: string) -> AppendHandle)?,
 }
 

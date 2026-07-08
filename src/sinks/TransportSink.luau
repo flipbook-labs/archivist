@@ -3,7 +3,7 @@
 	platforms, HTTP ingest endpoints, analytics).
 
 	Buffers records across writes and hands the accumulated array to `send`
-	when the buffer reaches `batchSize` or on `flush` — so a destination like
+	when the buffer reaches `batchSize` or on `flush`, so a destination like
 	an HTTP API receives one request per batch, never one per record. Archivist
 	deliberately doesn't do the HTTP itself: `send` gets plain records and the
 	caller brings their own client (Lute `@lute/net`, Roblox HttpService).

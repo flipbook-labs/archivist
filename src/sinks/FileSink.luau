@@ -1,7 +1,7 @@
 --[[
 	Appends formatted records to a log file, one per line. Lute only: the
 	constructor errors on runtimes without a filesystem (Roblox), which is a
-	deliberate fail-fast — a silently dropped log file is worse than a loud one.
+	deliberate fail-fast. A silently dropped log file is worse than a loud one.
 
 	The file opens lazily on the first write and stays open; a whole batch is
 	appended with a single filesystem write. Defaults to the JsonFormatter so

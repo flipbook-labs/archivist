@@ -72,7 +72,7 @@ local logger = Archivist.createLogger("App", {
 		-- The runtime's console: colored stdout on Lute, print/warn on Roblox.
 		Archivist.ConsoleSink(),
 
-		-- Any custom destination — e.g. an in-app log viewer panel:
+		-- Any custom destination, e.g. an in-app log viewer panel:
 		Archivist.CallbackSink(function(record)
 			LogsStore.addLine(record)
 		end),

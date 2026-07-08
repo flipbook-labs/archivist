@@ -11,7 +11,7 @@
 
 	Encoding is the platform's native JSON (Lute @std/json, Roblox
 	HttpService). Records containing unencodable values (functions, cycles)
-	fall back to a stringified payload rather than erroring — a lossy log line
+	fall back to a stringified payload rather than erroring. A lossy log line
 	beats a crashing logger.
 ]]
 
