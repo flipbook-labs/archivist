@@ -27,9 +27,9 @@ if #luaFiles > 0 then
 	process.exit(1)
 end
 
--- Dist hygiene: the shipped Roblox tree must not contain Lute-only requires,
--- test files, or test helpers. Only meaningful after a build; CI builds before
--- linting so these always run there.
+-- A Lute-only require that leaks into the shipped Roblox tree errors the
+-- moment Roblox loads the module, and test files bloat every consumer's
+-- install. These checks need a build to inspect, so CI builds before linting.
 if fs.exists(project.BUILD_PATH) then
 	local problems = {}
 

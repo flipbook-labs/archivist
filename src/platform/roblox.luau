@@ -17,9 +17,6 @@ local platform: types.Platform = {
 		-- selene: allow(undefined_variable)
 		warn(line)
 	end,
-	-- os.time takes an optional DateTypeArg, so its type is (DateTypeArg?) -> number
-	-- and does not satisfy Platform.now's () -> number under strict analysis;
-	-- wrapping drops the optional parameter.
 	now = function()
 		return os.time()
 	end,
