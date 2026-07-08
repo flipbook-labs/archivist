@@ -4,3 +4,5 @@
 /sourcemap*.json
 *.rbxm
 package.zip
+*.lock.luau
+/wally.lock

@@ -62,9 +62,15 @@ Archivist uses [Rokit](https://github.com/rojo-rbx/rokit) for toolchain manageme
 
 ```sh
 rokit install
+lute run install   # install Loom + Wally dependencies and Lute type defs
 lute run example   # run the demo script under Lute
 lute run build     # build the Roblox model (Archivist.rbxm)
 ```
+
+`lute run install` wraps `lute pkg install`, `wally install`, and `lute setup` so a
+fresh checkout is one command. It also fetches the shared
+[agent-skills](https://github.com/flipbook-labs/agent-skills) library that
+[`AGENTS.md`](AGENTS.md) routes agents to.
 
 ## License
 
