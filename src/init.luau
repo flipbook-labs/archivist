@@ -1,5 +1,5 @@
 --[[
-	Archivist — a structured logging library for Luau that runs on both Lute
+	Archivist: a structured logging library for Luau that runs on both Lute
 	and Roblox.
 
 	`require` resolves the platform seam (`@root/platform`) to the Lute or

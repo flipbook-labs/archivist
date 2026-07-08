@@ -31,9 +31,6 @@ local platform: types.Platform = {
 	warn = function(line)
 		io.write(line .. "\n")
 	end,
-	-- os.time takes an optional DateTypeArg, so its type is (DateTypeArg?) -> number
-	-- and does not satisfy Platform.now's () -> number under strict analysis;
-	-- wrapping drops the optional parameter.
 	now = function()
 		return os.time()
 	end,
@@ -71,7 +68,7 @@ local platform: types.Platform = {
 		-- `process.onSignal` suppresses the default terminate behavior, so exit
 		-- manually after flushing. 130/143 are the conventional exit codes for
 		-- SIGINT/SIGTERM. The live handles also keep the event loop open, which
-		-- is exactly the hold semantics we want — and why they must be closed
+		-- is exactly the hold semantics we want, and why they must be closed
 		-- once the batch drains.
 		local sigint = process.onSignal("SIGINT", function()
 			flush()

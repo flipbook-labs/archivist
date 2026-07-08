@@ -12,7 +12,7 @@ A structured logging library for Luau that runs on both [Lute](https://github.co
 - **`LOG_LEVEL`**: level resolution from the environment on Lute, `_G.LOG_LEVEL` on Roblox
 - **Colorful output**: ANSI-colored console output on Lute; plain `print`/`warn` on Roblox
 - **Structured records**: every entry is a `LogRecord` object (timestamp, level, name, args) that sinks can consume
-- **Sinks**: route records anywhere — console, files (Lute), or your own callback (e.g. an in-app log viewer)
+- **Sinks**: route records anywhere: console, files (Lute), or your own callback (e.g. an in-app log viewer)
 - **Dev/prod deferral**: sequential `print`-like output in dev; in prod, records batch and each sink is written once per batch instead of once per record
 
 ## Installation
