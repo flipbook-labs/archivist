@@ -38,7 +38,7 @@ export type Logger = {
 	-- Derives a logger that shares this logger's sinks, level, and mode at
 	-- creation time. `name` is appended as "parent/name"; `fields` are merged
 	-- over the parent's fields and attached to every record.
-	child: (name: string?, fields: { [string]: any }?) -> Logger,
+	child: (name: string?, fields: { [string]: unknown }?) -> Logger,
 
 	-- Forces any batched records (prod mode) out to sinks immediately.
 	flush: () -> (),
@@ -48,7 +48,7 @@ export type LoggerConfig = {
 	level: LogLevelT,
 	mode: Mode,
 	sinks: { SinkT },
-	fields: { [string]: any }?,
+	fields: { [string]: unknown }?,
 }
 
 local function createLogger(

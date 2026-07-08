@@ -44,7 +44,7 @@ export type CreateLoggerOptions = {
 	-- Output targets. Defaults to a single console sink.
 	sinks: { Sink }?,
 	-- Structured context attached to every record from this logger.
-	fields: { [string]: any }?,
+	fields: { [string]: unknown }?,
 }
 
 -- Resolves the starting level: explicit option, then LOG_LEVEL, then
