@@ -1,4 +1,3 @@
---!strict
 --[[
 	Public entry point.
 

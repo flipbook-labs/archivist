@@ -1,7 +1,7 @@
 return {
 	package = {
 		name = "Archivist",
-		version = "0.1.0",
+		version = "0.0.0",
 		dependencies = {
 			AgentSkills = {
 				rev = "v0.2.0",

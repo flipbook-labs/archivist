@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: flipbook-labs/changewrite@v0.5.0
+        with:
+          require-entry: 'true'
+
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: CompeyDev/setup-rokit@1d9390883f7ebce19d48f5b8d006e11d387c92ab # v0.2.1
+        with:
+          version: v1.2.0
+
+      - name: Build
+        run: lute run build
+
+      - name: Lint
+        run: lute run lint
+
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: CompeyDev/setup-rokit@1d9390883f7ebce19d48f5b8d006e11d387c92ab # v0.2.1
+        with:
+          version: v1.2.0
+
+      - name: Setup Lute typedefs
+        run: lute setup
+
+      - name: Install packages
+        run: lute pkg install
+
+      - name: Run tests
+        run: lute test
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: CompeyDev/setup-rokit@1d9390883f7ebce19d48f5b8d006e11d387c92ab # v0.2.1
+        with:
+          version: v1.2.0
+
+      - name: Build
+        run: lute run build
+
+      - name: Get model file name
+        run: |
+          sha=${GITHUB_SHA:0:7}
+          echo "MODEL_FILE=Archivist-$sha.rbxm" >> $GITHUB_ENV
+
+      - name: Rename model
+        run: mv Archivist.rbxm ${{ env.MODEL_FILE }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.MODEL_FILE }}
+          path: ${{ env.MODEL_FILE }}
+
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: CompeyDev/setup-rokit@1d9390883f7ebce19d48f5b8d006e11d387c92ab # v0.2.1
+        with:
+          version: v1.2.0
+
+      - name: Setup Lute typedefs
+        run: lute setup
+
+      - name: Install packages
+        run: lute pkg install
+
+      - name: Build
+        run: lute run build
+
+      - name: Run Luau analysis
+        run: lute run analyze

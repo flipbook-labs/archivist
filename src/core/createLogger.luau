@@ -1,8 +1,7 @@
---!strict
 --[[
 	Minimal logger used to prove the platform seam (Stage 1 spike).
 
-	Dot-style, varargs API — drop-in shaped like FlipbookBatteries' createLogger:
+	Dot-style, varargs API, drop-in shaped like FlipbookBatteries' createLogger:
 		logger.info("message", value, ...)
 
 	The full core (structured records, sinks, dev/prod batching) lands in Stage 2;
