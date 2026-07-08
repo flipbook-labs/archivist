@@ -14,10 +14,7 @@ local types = require("@root/platform/types")
 -- unbind, so bind each distinct flush function only once for the session.
 local boundFlushes: { [() -> ()]: boolean } = {}
 
--- The Roblox Output window strips ANSI codes, so styles are identity. If
--- terminal-rendered output ever matters here (e.g. Open Cloud runs), these can
--- delegate to a chalk-style Wally package instead — Jest-Lua uses
--- jsdotlua/chalk for exactly that.
+-- The Roblox Output window strips ANSI codes, so styles are identity.
 local function identity(text: string): string
 	return text
 end
@@ -35,9 +32,6 @@ local platform: types.Platform = {
 		-- selene: allow(undefined_variable)
 		warn(line)
 	end,
-	-- os.time takes an optional DateTypeArg, so its type is (DateTypeArg?) -> number
-	-- and does not satisfy Platform.now's () -> number under strict analysis;
-	-- wrapping drops the optional parameter.
 	now = function()
 		return os.time()
 	end,

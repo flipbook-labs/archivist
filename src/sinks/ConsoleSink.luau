@@ -5,7 +5,7 @@
 
 	Batches are written with one platform call per contiguous run of records on
 	the same stream, so a 100-record batch costs a handful of `print`s rather
-	than 100 — `print`/`warn` are expensive, which is the whole point of prod
+	than 100. `print`/`warn` are expensive, which is the whole point of prod
 	mode.
 ]]
 

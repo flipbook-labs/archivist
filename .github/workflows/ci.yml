@@ -28,7 +28,7 @@ jobs:
         with:
           version: v1.2.0
 
-      - name: Build (lint verifies dist hygiene)
+      - name: Build
         run: lute run build
 
       - name: Lint
@@ -47,7 +47,7 @@ jobs:
       - name: Setup Lute typedefs
         run: lute setup
 
-      - name: Install packages (test helpers use the Lute batteries)
+      - name: Install packages
         run: lute pkg install
 
       - name: Run tests
@@ -92,10 +92,10 @@ jobs:
       - name: Setup Lute typedefs
         run: lute setup
 
-      - name: Install packages (Lute batteries, referenced by std typedefs)
+      - name: Install packages
         run: lute pkg install
 
-      - name: Build (analysis covers the built Roblox flavor)
+      - name: Build
         run: lute run build
 
       - name: Run Luau analysis

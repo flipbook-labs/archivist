@@ -4,14 +4,14 @@
 
 	- dev: each record is written to its sinks synchronously, like `print`.
 	- prod: records queue, and one `platform.defer` callback drains the whole
-	  queue — each sink receives every record queued since the last flush in a
+	  queue, so each sink receives every record queued since the last flush in a
 	  single `write` call, so expensive outputs (print, file writes) happen once
 	  per batch instead of once per record.
 
 	A single dispatcher is shared by every logger so batched records flush in
 	global call order. While a batch is pending the dispatcher holds the process
 	open via `platform.holdForFlush` (so an interrupt or shutdown flushes the
-	queue first) and releases the hold as soon as the queue drains — on Lute
+	queue first) and releases the hold as soon as the queue drains. On Lute
 	that release is what lets the process exit naturally.
 ]]
 

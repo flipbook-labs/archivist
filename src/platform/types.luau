@@ -38,7 +38,7 @@ export type Platform = {
 	-- (Lute: batteries pp; Roblox: HttpService:JSONEncode with tostring fallback).
 	inspect: (value: any) -> string,
 	-- Encodes a value as JSON (Lute: @std/json; Roblox: HttpService). Throws on
-	-- unencodable input — callers pcall and fall back.
+	-- unencodable input, so callers pcall and fall back.
 	jsonEncode: (value: any) -> string,
 	-- Schedules `callback` to run soon, after the current execution finishes
 	-- (Lute/Roblox `task.defer`). Used to coalesce batched log writes.
