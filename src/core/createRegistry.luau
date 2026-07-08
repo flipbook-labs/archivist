@@ -4,7 +4,7 @@
 	without threading it through requires.
 ]]
 
-local Logger = require("@root/core/Logger")
+local Logger = require("@root/core/createLogger")
 
 export type Registry = {
 	get: (name: string, create: () -> Logger.Logger) -> Logger.Logger,

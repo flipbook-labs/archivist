@@ -1,7 +1,7 @@
 local expect = require("@std/test/assert")
 local test = require("@std/test")
 
-local Logger = require("@root/core/Logger")
+local Logger = require("@root/core/createLogger")
 local createCaptureSink = require("@root/testing/createCaptureSink")
 local createDispatcher = require("@root/core/createDispatcher")
 local createFakePlatform = require("@root/testing/createFakePlatform")
