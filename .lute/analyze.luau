@@ -33,8 +33,6 @@ run({
 	"--settings=./.vscode/settings.json",
 	"--ignore",
 	"**/platform/roblox.luau",
-	"--ignore",
-	"**/vendor/**",
 	project.SOURCE_PATH,
 	project.SCRIPTS_PATH,
 })
@@ -54,8 +52,6 @@ run({
 	`--sourcemap={project.SOURCEMAP_PATH}`,
 	"--flag:LuauSolverV2=true",
 	"--settings=./.vscode/settings.json",
-	"--ignore",
-	"**/vendor/**",
 	project.BUILD_PATH,
 })
 
