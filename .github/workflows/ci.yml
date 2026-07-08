@@ -44,6 +44,12 @@ jobs:
         with:
           version: v1.2.0
 
+      - name: Setup Lute typedefs
+        run: lute setup
+
+      - name: Install packages (test helpers use the Lute batteries)
+        run: lute pkg install
+
       - name: Run tests
         run: lute test
 
