@@ -6,6 +6,7 @@
 		"luaupkg": "~/.loom/store",
 		"pkg": "./Packages",
 		"repo": ".",
-		"root": "./src"
+		"root": "./src",
+		"batteries": "~/.loom/store/Lute@v1.0.1-nightly.20260701/batteries"
 	}
 }
