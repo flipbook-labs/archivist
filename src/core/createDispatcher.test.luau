@@ -79,6 +79,27 @@ test.suite("Dispatcher prod mode", function(suite)
 		expect.eq(captureB.batches[1][1].args[1], "both")
 	end)
 
+	suite:case("snapshots the sink list at dispatch time, not flush time", function()
+		local fake = createFakePlatform()
+		local dispatcher = createDispatcher(fake.platform)
+		local captureA = createCaptureSink()
+		local captureB = createCaptureSink()
+
+		local sinks = { captureA.sink }
+		dispatcher.dispatch(sinks, record("info", "queued for A"), "prod")
+
+		-- Mutating the sink list (as addSink/removeSink do) before the deferred
+		-- flush must not reroute the already-queued record away from A to B.
+		table.remove(sinks, 1)
+		table.insert(sinks, captureB.sink)
+
+		fake.runDeferred()
+
+		expect.eq(#captureA.batches, 1)
+		expect.eq(captureA.batches[1][1].args[1], "queued for A")
+		expect.eq(#captureB.batches, 0)
+	end)
+
 	suite:case("manual flush drains the queue immediately", function()
 		local fake = createFakePlatform()
 		local dispatcher = createDispatcher(fake.platform)
