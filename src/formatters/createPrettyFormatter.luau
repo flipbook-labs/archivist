@@ -40,7 +40,7 @@ local function createPrettyFormatter(platform: types.Platform, options: PrettyFo
 			table.insert(parts, style(platform.styles.dim)(clock))
 		end
 
-		local prefix = `[{record.name}] [{record.level}]`
+		local prefix = `[{record.name}] [{record.level:lower()}]`
 		table.insert(parts, style(platform.styles.levels[record.level])(prefix))
 
 		for index = 1, record.args.n do

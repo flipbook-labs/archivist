@@ -43,11 +43,11 @@ local platform: types.Platform = {
 	color = false,
 	styles = {
 		levels = {
-			trace = identity,
-			debug = identity,
-			info = identity,
-			warn = identity,
-			err = identity,
+			Trace = identity,
+			Debug = identity,
+			Info = identity,
+			Warn = identity,
+			Err = identity,
 		},
 		dim = identity,
 	},

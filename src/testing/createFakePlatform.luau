@@ -61,11 +61,11 @@ local function createFakePlatform(): FakePlatform
 		color = false,
 		styles = {
 			levels = {
-				trace = marker("trace"),
-				debug = marker("debug"),
-				info = marker("info"),
-				warn = marker("warn"),
-				err = marker("err"),
+				Trace = marker("trace"),
+				Debug = marker("debug"),
+				Info = marker("info"),
+				Warn = marker("warn"),
+				Err = marker("err"),
 			},
 			dim = marker("dim"),
 		},

@@ -61,7 +61,7 @@ batched.info("queued 2")
 batched.flush() -- optional; pending batches also flush on defer and at exit
 
 -- Show everything, regardless of LOG_LEVEL:
-local verbose = Archivist.createLogger("MyModule", { level = "trace" })
+local verbose = Archivist.createLogger("MyModule", { level = "Trace" })
 ```
 
 The minimum level resolves from, in order: the `level` option, the `LOG_LEVEL`

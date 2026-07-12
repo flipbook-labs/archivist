@@ -10,11 +10,11 @@ local types = require("@root/platform/types")
 export type LogLevel = types.LogLevel
 
 local LogLevel = {
-	Trace = "trace" :: "trace",
-	Debug = "debug" :: "debug",
-	Info = "info" :: "info",
-	Warn = "warn" :: "warn",
-	Err = "err" :: "err",
+	Trace = "Trace" :: "Trace",
+	Debug = "Debug" :: "Debug",
+	Info = "Info" :: "Info",
+	Warn = "Warn" :: "Warn",
+	Err = "Err" :: "Err",
 }
 
 local ORDER: { [LogLevel]: number } = {
@@ -32,14 +32,17 @@ function LogLevel.shouldLog(minimum: LogLevel, level: LogLevel): boolean
 	return ORDER[level] >= ORDER[minimum]
 end
 
--- Coerces an arbitrary string (e.g. from LOG_LEVEL) to a LogLevel, or nil.
+-- Coerces an arbitrary string (e.g. from LOG_LEVEL) to a LogLevel, or nil. The
+-- match is case-insensitive so `LOG_LEVEL=info` resolves to `Info`.
 function LogLevel.coerce(raw: string?): LogLevel?
 	if not raw then
 		return nil
 	end
-	local lowered = string.lower(raw)
-	if ORDER[lowered :: LogLevel] then
-		return lowered :: LogLevel
+	local lowered = raw:lower()
+	for level in ORDER do
+		if level:lower() == lowered then
+			return level
+		end
 	end
 	-- Accept a couple of common aliases.
 	if lowered == "error" then

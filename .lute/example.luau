@@ -22,5 +22,5 @@ batched.info("queued 1")
 batched.info("queued 2")
 batched.info("queued 3")
 
-local verbose = Archivist.createLogger("verbose", { level = "trace" })
+local verbose = Archivist.createLogger("verbose", { level = "Trace" })
 verbose.trace("...but trace shows when the level is lowered")

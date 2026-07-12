@@ -7,7 +7,7 @@
 	`@lute/*` or Roblox globals directly.
 ]]
 
-export type LogLevel = "trace" | "debug" | "info" | "warn" | "err"
+export type LogLevel = "Trace" | "Debug" | "Info" | "Warn" | "Err"
 
 -- Wraps text in console styling (e.g. ANSI color). Identity on runtimes whose
 -- console doesn't support styling.
