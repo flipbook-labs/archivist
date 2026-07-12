@@ -8,6 +8,9 @@
 	the targeted allows below.
 ]]
 
+-- selene: allow(undefined_variable)
+local HttpService = game:GetService("HttpService")
+
 local types = require("@root/platform/types")
 
 -- `holdForFlush` is called once per batch window but `game:BindToClose` has no
@@ -20,8 +23,7 @@ local function identity(text: string): string
 end
 
 local function jsonEncode(value: any): string
-	-- selene: allow(undefined_variable)
-	return game:GetService("HttpService"):JSONEncode(value)
+	return HttpService:JSONEncode(value)
 end
 
 local platform: types.Platform = {

@@ -10,6 +10,7 @@
 ]]
 
 local Formatter = require("@root/core/Formatter")
+local LogLevel = require("@root/core/LogLevel")
 local LogRecord = require("@root/core/LogRecord")
 local Sink = require("@root/core/Sink")
 local createPrettyFormatter = require("@root/formatters/createPrettyFormatter")
@@ -21,7 +22,7 @@ export type ConsoleSinkOptions = {
 }
 
 local function isWarnStream(record: LogRecord.LogRecord): boolean
-	return record.level == "warn" or record.level == "err"
+	return record.level == LogLevel.Warn or record.level == LogLevel.Err
 end
 
 local function createConsoleSink(platform: types.Platform, options: ConsoleSinkOptions?): Sink.Sink
