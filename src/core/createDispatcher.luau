@@ -87,7 +87,10 @@ local function createDispatcher(platform: types.Platform): Dispatcher
 			return
 		end
 
-		table.insert(queue, { sinks = sinks, record = record })
+		-- Snapshot the sink list: dev mode iterates it now, so prod must capture
+		-- it now too. Otherwise an addSink/removeSink before the deferred flush
+		-- would reroute records already queued against the old set.
+		table.insert(queue, { sinks = table.clone(sinks), record = record })
 
 		if not releaseHold then
 			releaseHold = platform.holdForFlush(flush)
