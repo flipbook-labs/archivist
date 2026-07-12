@@ -7,7 +7,7 @@
 	`@lute/*` or Roblox globals directly.
 ]]
 
-export type LogLevel = "trace" | "debug" | "info" | "warn" | "err"
+export type LogLevel = "Trace" | "Debug" | "Info" | "Warn" | "Err"
 
 -- A handle to a file opened for appending; see `Platform.openAppendable`.
 export type AppendHandle = {

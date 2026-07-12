@@ -55,13 +55,13 @@ local child = logger.child("requests", { requestId = "abc123" })
 child.debug("handling request")
 
 -- Prod mode batches: these queue and flush to each sink as ONE write.
-local batched = Archivist.createLogger("Telemetry", { mode = "prod" })
+local batched = Archivist.createLogger("Telemetry", { mode = "Prod" })
 batched.info("queued 1")
 batched.info("queued 2")
 batched.flush() -- optional; pending batches also flush on defer and at exit
 
 -- Show everything, regardless of LOG_LEVEL:
-local verbose = Archivist.createLogger("MyModule", { level = "trace" })
+local verbose = Archivist.createLogger("MyModule", { level = "Trace" })
 ```
 
 ### Sinks
@@ -70,18 +70,18 @@ local verbose = Archivist.createLogger("MyModule", { level = "trace" })
 local logger = Archivist.createLogger("App", {
 	sinks = {
 		-- The runtime's console: colored stdout on Lute, print/warn on Roblox.
-		Archivist.ConsoleSink(),
+		Archivist.createConsoleSink(),
 
 		-- Any custom destination, e.g. an in-app log viewer panel:
-		Archivist.CallbackSink(function(record)
+		Archivist.createCallbackSink(function(record)
 			LogsStore.addLine(record)
 		end),
 
 		-- A JSON-lines log file (Lute only):
-		Archivist.FileSink({ path = "logs/app.log" }),
+		Archivist.createFileSink({ path = "logs/app.log" }),
 
 		-- Ship batches to an external platform; bring your own HTTP client:
-		Archivist.TransportSink({
+		Archivist.createTransportSink({
 			batchSize = 50,
 			send = function(records)
 				httpClient.post(INGEST_URL, records)
@@ -91,10 +91,10 @@ local logger = Archivist.createLogger("App", {
 })
 ```
 
-Formatters control how text-oriented sinks render records: `PrettyFormatter`
-(human-readable, optional ANSI color) and `JsonFormatter` (one JSON object per
-line). Sinks that consume records structurally (CallbackSink, TransportSink)
-bypass formatting entirely.
+Formatters control how text-oriented sinks render records: `createPrettyFormatter`
+(human-readable, optional ANSI color) and `createJsonFormatter` (one JSON object
+per line). Sinks that consume records structurally (`createCallbackSink`,
+`createTransportSink`) bypass formatting entirely.
 
 The minimum level resolves from, in order: the `level` option, the `LOG_LEVEL`
 environment variable (Lute), `_G.LOG_LEVEL` (Roblox), then defaults to `info`.

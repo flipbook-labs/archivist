@@ -15,10 +15,12 @@
 	that release is what lets the process exit naturally.
 ]]
 
+local LogMode = require("@root/core/LogMode")
 local LogRecord = require("@root/core/LogRecord")
 local Sink = require("@root/core/Sink")
 local types = require("@root/platform/types")
 
+type LogModeT = LogMode.LogMode
 type LogRecordT = LogRecord.LogRecord
 type SinkT = Sink.Sink
 
@@ -27,7 +29,7 @@ type SinkT = Sink.Sink
 local MAX_QUEUED_RECORDS = 512
 
 export type Dispatcher = {
-	dispatch: (sinks: { SinkT }, record: LogRecordT, mode: "dev" | "prod") -> (),
+	dispatch: (sinks: { SinkT }, record: LogRecordT, mode: LogModeT) -> (),
 	flush: () -> (),
 }
 
@@ -44,51 +46,45 @@ local function createDispatcher(platform: types.Platform): Dispatcher
 	local function flush()
 		flushScheduled = false
 
+		if #queue > 0 then
+			local draining = queue
+			queue = {}
+
+			-- Group the drained records per sink, preserving call order, so each
+			-- sink gets exactly one `write` for the whole batch.
+			local sinkBatches: { [SinkT]: { LogRecordT } } = {}
+			local sinkOrder: { SinkT } = {}
+
+			for _, entry in draining do
+				for _, sink in entry.sinks do
+					local batch = sinkBatches[sink]
+					if not batch then
+						batch = {}
+						sinkBatches[sink] = batch
+						table.insert(sinkOrder, sink)
+					end
+					table.insert(batch, entry.record)
+				end
+			end
+
+			for _, sink in sinkOrder do
+				sink.write(sinkBatches[sink])
+			end
+		end
+
+		-- Release the hold only after every sink has been written. On Lute the
+		-- hold is the live SIGINT/SIGTERM handles, so keeping them open across the
+		-- write phase means an interrupt mid-flush still drains the batch instead
+		-- of dropping it.
 		if releaseHold then
 			local release = releaseHold
 			releaseHold = nil
 			release()
 		end
-
-		if #queue == 0 then
-			return
-		end
-
-		local draining = queue
-		queue = {}
-
-		-- Group the drained records per sink, preserving call order, so each
-		-- sink gets exactly one `write` for the whole batch.
-		local sinkBatches: { [SinkT]: { LogRecordT } } = {}
-		local sinkOrder: { SinkT } = {}
-
-		for _, entry in draining do
-			for _, sink in entry.sinks do
-				local batch = sinkBatches[sink]
-				if not batch then
-					batch = {}
-					sinkBatches[sink] = batch
-					table.insert(sinkOrder, sink)
-				end
-				table.insert(batch, entry.record)
-			end
-		end
-
-		for _, sink in sinkOrder do
-			sink.write(sinkBatches[sink])
-		end
-
-		-- Propagate to sinks that buffer across batches (e.g. TransportSink),
-		-- so an exit-time drain also pushes their buffers out.
-		for _, sink in sinkOrder do
-			if sink.flush then
-				sink.flush()
-			end
-		end
 	end
 
-	local function dispatch(sinks: { SinkT }, record: LogRecordT, mode: "dev" | "prod")
-		if mode == "dev" then
+	local function dispatch(sinks: { SinkT }, record: LogRecordT, mode: LogModeT)
+		if mode == LogMode.Dev then
 			for _, sink in sinks do
 				sink.write({ record })
 			end

@@ -4,15 +4,16 @@ local path = require("@std/path")
 local system = require("@std/system")
 local test = require("@std/test")
 
-local FileSink = require("@root/sinks/FileSink")
+local LogLevel = require("@root/core/LogLevel")
 local LogRecord = require("@root/core/LogRecord")
 local createFakePlatform = require("@root/testing/createFakePlatform")
+local createFileSink = require("@root/sinks/createFileSink")
 local lutePlatform = require("@root/platform/lute")
 
 local function record(message: string): LogRecord.LogRecord
 	return {
 		timestamp = 1750000000,
-		level = "info",
+		level = LogLevel.Info,
 		name = "test",
 		args = table.pack(message),
 	}
@@ -21,7 +22,7 @@ end
 test.suite("FileSink", function(suite)
 	suite:case("appends one line per record with a single write per batch", function()
 		local fake = createFakePlatform()
-		local sink = FileSink(fake.platform, { path = "app.log" })
+		local sink = createFileSink(fake.platform, { path = "app.log" })
 
 		sink.write({ record("one"), record("two") })
 
@@ -33,7 +34,7 @@ test.suite("FileSink", function(suite)
 
 	suite:case("uses the JsonFormatter by default", function()
 		local fake = createFakePlatform()
-		local sink = FileSink(fake.platform, { path = "app.log" })
+		local sink = createFileSink(fake.platform, { path = "app.log" })
 
 		sink.write({ record("hello") })
 
@@ -42,7 +43,7 @@ test.suite("FileSink", function(suite)
 
 	suite:case("keeps the file open across batches and closes on close", function()
 		local fake = createFakePlatform()
-		local sink = FileSink(fake.platform, { path = "app.log" })
+		local sink = createFileSink(fake.platform, { path = "app.log" })
 
 		sink.write({ record("one") })
 		sink.write({ record("two") })
@@ -58,13 +59,13 @@ test.suite("FileSink", function(suite)
 		fake.platform.openAppendable = nil
 
 		expect.throws(function()
-			FileSink(fake.platform, { path = "app.log" })
+			createFileSink(fake.platform, { path = "app.log" })
 		end)
 	end)
 
 	suite:case("writes a real file on Lute", function()
 		local logPath = tostring(path.join(system.tmpdir(), `archivist-filesink-test-{os.clock()}.log`))
-		local sink = FileSink(lutePlatform, { path = logPath })
+		local sink = createFileSink(lutePlatform, { path = logPath })
 
 		sink.write({ record("first"), record("second") })
 		sink.write({ record("third") })

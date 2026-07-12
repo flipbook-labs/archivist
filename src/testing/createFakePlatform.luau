@@ -5,6 +5,8 @@
 	- `defer` captures callbacks; tests pump them explicitly via `runDeferred`
 	- `now` returns a fixed, settable time
 	- `env` is a plain table backing `getEnv`
+	- `openAppendable` is an in-memory filesystem: `files` holds appended chunks
+	  per path, `closedFiles` records which handles were closed
 	- `styles` wrap text in `<style>...</style>` markers so assertions can
 	  check that (and which) styling was applied without ANSI escapes
 	- `inspect`/`jsonEncode` use the real Lute implementations (this helper
@@ -67,11 +69,11 @@ local function createFakePlatform(): FakePlatform
 		color = false,
 		styles = {
 			levels = {
-				trace = marker("trace"),
-				debug = marker("debug"),
-				info = marker("info"),
-				warn = marker("warn"),
-				err = marker("err"),
+				Trace = marker("trace"),
+				Debug = marker("debug"),
+				Info = marker("info"),
+				Warn = marker("warn"),
+				Err = marker("err"),
 			},
 			dim = marker("dim"),
 		},

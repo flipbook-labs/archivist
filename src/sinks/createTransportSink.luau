@@ -8,7 +8,7 @@
 	deliberately doesn't do the HTTP itself: `send` gets plain records and the
 	caller brings their own client (Lute `@lute/net`, Roblox HttpService).
 
-		local transport = Archivist.TransportSink({
+		local transport = Archivist.createTransportSink({
 			batchSize = 50,
 			send = function(records)
 				someHttpClient.post(INGEST_URL, records)

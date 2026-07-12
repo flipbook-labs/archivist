@@ -1,13 +1,14 @@
 local expect = require("@std/test/assert")
 local test = require("@std/test")
 
+local LogLevel = require("@root/core/LogLevel")
 local LogRecord = require("@root/core/LogRecord")
-local TransportSink = require("@root/sinks/TransportSink")
+local createTransportSink = require("@root/sinks/createTransportSink")
 
 local function record(message: any): LogRecord.LogRecord
 	return {
 		timestamp = 0,
-		level = "info",
+		level = LogLevel.Info,
 		name = "test",
 		args = table.pack(message),
 	}
@@ -16,7 +17,7 @@ end
 test.suite("TransportSink", function(suite)
 	suite:case("buffers below batchSize without sending", function()
 		local sends = {}
-		local sink = TransportSink({
+		local sink = createTransportSink({
 			batchSize = 3,
 			send = function(records)
 				table.insert(sends, records)
@@ -31,7 +32,7 @@ test.suite("TransportSink", function(suite)
 
 	suite:case("sends the whole buffer when batchSize is reached", function()
 		local sends = {}
-		local sink = TransportSink({
+		local sink = createTransportSink({
 			batchSize = 3,
 			send = function(records)
 				table.insert(sends, records)
@@ -49,7 +50,7 @@ test.suite("TransportSink", function(suite)
 
 	suite:case("flush sends a partial buffer and empties it", function()
 		local sends = {}
-		local sink = TransportSink({
+		local sink = createTransportSink({
 			batchSize = 100,
 			send = function(records)
 				table.insert(sends, records)
@@ -70,7 +71,7 @@ test.suite("TransportSink", function(suite)
 
 	suite:case("accumulates again after a send", function()
 		local sends = {}
-		local sink = TransportSink({
+		local sink = createTransportSink({
 			batchSize = 2,
 			send = function(records)
 				table.insert(sends, records)

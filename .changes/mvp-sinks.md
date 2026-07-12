@@ -3,4 +3,4 @@ bump: minor
 category: Features
 ---
 
-Add the `CallbackSink`, `FileSink` (Lute), and `TransportSink` sinks, plus a `JsonFormatter`.
+Add the `createCallbackSink`, `createFileSink` (Lute), and `createTransportSink` sinks, plus a `createJsonFormatter`.

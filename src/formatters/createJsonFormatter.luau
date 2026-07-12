@@ -2,7 +2,7 @@
 	Machine-readable, one-JSON-object-per-line formatter for file sinks and
 	transports:
 
-		{"level":"info","message":"loaded 3 stories","name":"MyModule","timestamp":1750000000}
+		{"level":"Info","message":"loaded 3 stories","name":"MyModule","timestamp":1750000000}
 
 	`message` is the log call's arguments stringified and joined (the way a
 	human would read them); `args` additionally carries any non-string

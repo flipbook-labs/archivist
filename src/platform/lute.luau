@@ -44,11 +44,11 @@ local platform: types.Platform = {
 	color = true,
 	styles = {
 		levels = {
-			trace = toStyler(richterm.gray),
-			debug = toStyler(richterm.cyan),
-			info = toStyler(richterm.green),
-			warn = toStyler(richterm.yellow),
-			err = toStyler(richterm.red),
+			Trace = toStyler(richterm.gray),
+			Debug = toStyler(richterm.cyan),
+			Info = toStyler(richterm.green),
+			Warn = toStyler(richterm.yellow),
+			Err = toStyler(richterm.red),
 		},
 		dim = toStyler(richterm.dim),
 	},
