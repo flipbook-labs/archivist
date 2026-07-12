@@ -11,8 +11,8 @@
 
 local Formatter = require("@root/core/Formatter")
 local LogRecord = require("@root/core/LogRecord")
-local PrettyFormatter = require("@root/formatters/PrettyFormatter")
 local Sink = require("@root/core/Sink")
+local createPrettyFormatter = require("@root/formatters/createPrettyFormatter")
 local types = require("@root/platform/types")
 
 export type ConsoleSinkOptions = {
@@ -25,7 +25,7 @@ local function isWarnStream(record: LogRecord.LogRecord): boolean
 end
 
 local function createConsoleSink(platform: types.Platform, options: ConsoleSinkOptions?): Sink.Sink
-	local formatter = if options and options.formatter then options.formatter else PrettyFormatter(platform)
+	local formatter = if options and options.formatter then options.formatter else createPrettyFormatter(platform)
 
 	local function write(records: { LogRecord.LogRecord })
 		local runLines: { string } = {}

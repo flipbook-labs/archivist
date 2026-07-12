@@ -55,7 +55,7 @@ local child = logger.child("requests", { requestId = "abc123" })
 child.debug("handling request")
 
 -- Prod mode batches: these queue and flush to each sink as ONE write.
-local batched = Archivist.createLogger("Telemetry", { mode = "prod" })
+local batched = Archivist.createLogger("Telemetry", { mode = "Prod" })
 batched.info("queued 1")
 batched.info("queued 2")
 batched.flush() -- optional; pending batches also flush on defer and at exit

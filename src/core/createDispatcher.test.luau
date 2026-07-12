@@ -1,12 +1,14 @@
 local expect = require("@std/test/assert")
 local test = require("@std/test")
 
+local LogLevel = require("@root/core/LogLevel")
+local LogMode = require("@root/core/LogMode")
 local LogRecord = require("@root/core/LogRecord")
 local createCaptureSink = require("@root/testing/createCaptureSink")
 local createDispatcher = require("@root/core/createDispatcher")
 local createFakePlatform = require("@root/testing/createFakePlatform")
 
-local function record(level: "trace" | "debug" | "info" | "warn" | "err", message: any): LogRecord.LogRecord
+local function record(level: LogLevel.LogLevel, message: any): LogRecord.LogRecord
 	return {
 		timestamp = 0,
 		level = level,
@@ -21,8 +23,8 @@ test.suite("Dispatcher dev mode", function(suite)
 		local dispatcher = createDispatcher(fake.platform)
 		local capture = createCaptureSink()
 
-		dispatcher.dispatch({ capture.sink }, record("info", "one"), "dev")
-		dispatcher.dispatch({ capture.sink }, record("info", "two"), "dev")
+		dispatcher.dispatch({ capture.sink }, record(LogLevel.Info, "one"), LogMode.Dev)
+		dispatcher.dispatch({ capture.sink }, record(LogLevel.Info, "two"), LogMode.Dev)
 
 		expect.eq(#capture.batches, 2)
 		expect.eq(#capture.batches[1], 1)
@@ -36,9 +38,9 @@ test.suite("Dispatcher prod mode", function(suite)
 		local dispatcher = createDispatcher(fake.platform)
 		local capture = createCaptureSink()
 
-		dispatcher.dispatch({ capture.sink }, record("info", "one"), "prod")
-		dispatcher.dispatch({ capture.sink }, record("info", "two"), "prod")
-		dispatcher.dispatch({ capture.sink }, record("info", "three"), "prod")
+		dispatcher.dispatch({ capture.sink }, record(LogLevel.Info, "one"), LogMode.Prod)
+		dispatcher.dispatch({ capture.sink }, record(LogLevel.Info, "two"), LogMode.Prod)
+		dispatcher.dispatch({ capture.sink }, record(LogLevel.Info, "three"), LogMode.Prod)
 
 		-- Nothing written until the deferred flush runs.
 		expect.eq(#capture.batches, 0)
@@ -57,7 +59,7 @@ test.suite("Dispatcher prod mode", function(suite)
 		local capture = createCaptureSink()
 
 		for index = 1, 10 do
-			dispatcher.dispatch({ capture.sink }, record("info", index), "prod")
+			dispatcher.dispatch({ capture.sink }, record(LogLevel.Info, index), LogMode.Prod)
 		end
 
 		expect.eq(fake.runDeferred(), 1)
@@ -69,8 +71,8 @@ test.suite("Dispatcher prod mode", function(suite)
 		local captureA = createCaptureSink()
 		local captureB = createCaptureSink()
 
-		dispatcher.dispatch({ captureA.sink }, record("info", "a-only"), "prod")
-		dispatcher.dispatch({ captureA.sink, captureB.sink }, record("info", "both"), "prod")
+		dispatcher.dispatch({ captureA.sink }, record(LogLevel.Info, "a-only"), LogMode.Prod)
+		dispatcher.dispatch({ captureA.sink, captureB.sink }, record(LogLevel.Info, "both"), LogMode.Prod)
 
 		fake.runDeferred()
 
@@ -86,7 +88,7 @@ test.suite("Dispatcher prod mode", function(suite)
 		local captureB = createCaptureSink()
 
 		local sinks = { captureA.sink }
-		dispatcher.dispatch(sinks, record("info", "queued for A"), "prod")
+		dispatcher.dispatch(sinks, record(LogLevel.Info, "queued for A"), LogMode.Prod)
 
 		-- Mutating the sink list (as addSink/removeSink do) before the deferred
 		-- flush must not reroute the already-queued record away from A to B.
@@ -105,7 +107,7 @@ test.suite("Dispatcher prod mode", function(suite)
 		local dispatcher = createDispatcher(fake.platform)
 		local capture = createCaptureSink()
 
-		dispatcher.dispatch({ capture.sink }, record("info", "one"), "prod")
+		dispatcher.dispatch({ capture.sink }, record(LogLevel.Info, "one"), LogMode.Prod)
 		dispatcher.flush()
 
 		expect.eq(#capture.batches, 1)
@@ -120,7 +122,7 @@ test.suite("Dispatcher prod mode", function(suite)
 		local dispatcher = createDispatcher(fake.platform)
 		local capture = createCaptureSink()
 
-		dispatcher.dispatch({ capture.sink }, record("info", "pending"), "prod")
+		dispatcher.dispatch({ capture.sink }, record(LogLevel.Info, "pending"), LogMode.Prod)
 
 		-- Held but not yet released: an interrupt here must flush.
 		expect.eq(#fake.holds, 1)
@@ -135,13 +137,13 @@ test.suite("Dispatcher prod mode", function(suite)
 		local dispatcher = createDispatcher(fake.platform)
 		local capture = createCaptureSink()
 
-		dispatcher.dispatch({ capture.sink }, record("info", "one"), "prod")
+		dispatcher.dispatch({ capture.sink }, record(LogLevel.Info, "one"), LogMode.Prod)
 		fake.runDeferred()
 
 		expect.eq(fake.releasedCount(), 1)
 
 		-- The next batch takes (and later releases) a fresh hold.
-		dispatcher.dispatch({ capture.sink }, record("info", "two"), "prod")
+		dispatcher.dispatch({ capture.sink }, record(LogLevel.Info, "two"), LogMode.Prod)
 		expect.eq(#fake.holds, 2)
 		fake.runDeferred()
 		expect.eq(fake.releasedCount(), 2)
@@ -153,7 +155,7 @@ test.suite("Dispatcher prod mode", function(suite)
 		local capture = createCaptureSink()
 
 		for index = 1, 512 do
-			dispatcher.dispatch({ capture.sink }, record("info", index), "prod")
+			dispatcher.dispatch({ capture.sink }, record(LogLevel.Info, index), LogMode.Prod)
 		end
 
 		-- The 512th dispatch tripped the cap and flushed synchronously.

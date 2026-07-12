@@ -15,10 +15,12 @@
 	that release is what lets the process exit naturally.
 ]]
 
+local LogMode = require("@root/core/LogMode")
 local LogRecord = require("@root/core/LogRecord")
 local Sink = require("@root/core/Sink")
 local types = require("@root/platform/types")
 
+type LogModeT = LogMode.LogMode
 type LogRecordT = LogRecord.LogRecord
 type SinkT = Sink.Sink
 
@@ -27,7 +29,7 @@ type SinkT = Sink.Sink
 local MAX_QUEUED_RECORDS = 512
 
 export type Dispatcher = {
-	dispatch: (sinks: { SinkT }, record: LogRecordT, mode: "dev" | "prod") -> (),
+	dispatch: (sinks: { SinkT }, record: LogRecordT, mode: LogModeT) -> (),
 	flush: () -> (),
 }
 
@@ -79,8 +81,8 @@ local function createDispatcher(platform: types.Platform): Dispatcher
 		end
 	end
 
-	local function dispatch(sinks: { SinkT }, record: LogRecordT, mode: "dev" | "prod")
-		if mode == "dev" then
+	local function dispatch(sinks: { SinkT }, record: LogRecordT, mode: LogModeT)
+		if mode == LogMode.Dev then
 			for _, sink in sinks do
 				sink.write({ record })
 			end

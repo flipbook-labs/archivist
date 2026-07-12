@@ -4,14 +4,14 @@
 	without threading it through requires.
 ]]
 
-local Logger = require("@root/core/createLogger")
+local createLogger = require("@root/core/createLogger")
 
 export type Registry = {
-	get: (name: string, create: () -> Logger.Logger) -> Logger.Logger,
+	get: (name: string, create: () -> createLogger.Logger) -> createLogger.Logger,
 }
 
 local function createRegistry(): Registry
-	local loggers: { [string]: Logger.Logger } = {}
+	local loggers: { [string]: createLogger.Logger } = {}
 
 	return {
 		get = function(name, create)

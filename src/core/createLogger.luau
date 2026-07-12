@@ -11,15 +11,15 @@
 ]]
 
 local LogLevel = require("@root/core/LogLevel")
+local LogMode = require("@root/core/LogMode")
 local LogRecord = require("@root/core/LogRecord")
 local Sink = require("@root/core/Sink")
 local createDispatcher = require("@root/core/createDispatcher")
 local types = require("@root/platform/types")
 
 type LogLevelT = types.LogLevel
+type LogModeT = LogMode.LogMode
 type SinkT = Sink.Sink
-
-export type Mode = "dev" | "prod"
 
 export type Logger = {
 	trace: (...any) -> (),
@@ -30,8 +30,8 @@ export type Logger = {
 
 	getLevel: () -> LogLevelT,
 	setLevel: (level: LogLevelT) -> (),
-	getMode: () -> Mode,
-	setMode: (mode: Mode) -> (),
+	getMode: () -> LogModeT,
+	setMode: (mode: LogModeT) -> (),
 	addSink: (sink: SinkT) -> (),
 	removeSink: (sink: SinkT) -> (),
 
@@ -46,7 +46,7 @@ export type Logger = {
 
 export type LoggerConfig = {
 	level: LogLevelT,
-	mode: Mode,
+	mode: LogModeT,
 	sinks: { SinkT },
 	fields: { [string]: unknown }?,
 }
@@ -81,19 +81,19 @@ local function createLogger(
 
 	local logger: Logger = {
 		trace = function(...)
-			emit("trace", ...)
+			emit(LogLevel.Trace, ...)
 		end,
 		debug = function(...)
-			emit("debug", ...)
+			emit(LogLevel.Debug, ...)
 		end,
 		info = function(...)
-			emit("info", ...)
+			emit(LogLevel.Info, ...)
 		end,
 		warn = function(...)
-			emit("warn", ...)
+			emit(LogLevel.Warn, ...)
 		end,
 		err = function(...)
-			emit("err", ...)
+			emit(LogLevel.Err, ...)
 		end,
 
 		getLevel = function()

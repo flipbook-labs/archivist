@@ -1,22 +1,24 @@
 local expect = require("@std/test/assert")
 local test = require("@std/test")
 
-local Logger = require("@root/core/createLogger")
+local LogLevel = require("@root/core/LogLevel")
+local LogMode = require("@root/core/LogMode")
 local createCaptureSink = require("@root/testing/createCaptureSink")
 local createDispatcher = require("@root/core/createDispatcher")
 local createFakePlatform = require("@root/testing/createFakePlatform")
+local createLogger = require("@root/core/createLogger")
 
 local function createTestLogger(config: {
-	level: ("trace" | "debug" | "info" | "warn" | "err")?,
-	mode: ("dev" | "prod")?,
+	level: LogLevel.LogLevel?,
+	mode: LogMode.LogMode?,
 	fields: { [string]: any }?,
 })
 	local fake = createFakePlatform()
 	local dispatcher = createDispatcher(fake.platform)
 	local capture = createCaptureSink()
-	local logger = Logger(fake.platform, dispatcher, "test", {
-		level = config.level or "info",
-		mode = config.mode or "dev",
+	local logger = createLogger(fake.platform, dispatcher, "test", {
+		level = config.level or LogLevel.Info,
+		mode = config.mode or LogMode.Dev,
 		sinks = { capture.sink },
 		fields = config.fields,
 	})
@@ -25,7 +27,7 @@ end
 
 test.suite("Logger levels", function(suite)
 	suite:case("filters records below the minimum level", function()
-		local logger, capture = createTestLogger({ level = "info" })
+		local logger, capture = createTestLogger({ level = LogLevel.Info })
 
 		logger.trace("hidden")
 		logger.debug("hidden")
@@ -34,20 +36,20 @@ test.suite("Logger levels", function(suite)
 		logger.err("shown")
 
 		expect.eq(#capture.records, 3)
-		expect.eq(capture.records[1].level, "info")
-		expect.eq(capture.records[2].level, "warn")
-		expect.eq(capture.records[3].level, "err")
+		expect.eq(capture.records[1].level, LogLevel.Info)
+		expect.eq(capture.records[2].level, LogLevel.Warn)
+		expect.eq(capture.records[3].level, LogLevel.Err)
 	end)
 
 	suite:case("setLevel takes effect for subsequent calls", function()
-		local logger, capture = createTestLogger({ level = "err" })
+		local logger, capture = createTestLogger({ level = LogLevel.Err })
 
 		logger.info("hidden")
-		logger.setLevel("trace")
+		logger.setLevel(LogLevel.Trace)
 		logger.trace("shown")
 
 		expect.eq(#capture.records, 1)
-		expect.eq(capture.records[1].level, "trace")
+		expect.eq(capture.records[1].level, LogLevel.Trace)
 	end)
 end)
 

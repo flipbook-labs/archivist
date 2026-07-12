@@ -11,21 +11,22 @@
 		logger.info("loaded", count, "stories")
 ]]
 
-local ConsoleSink = require("@root/sinks/ConsoleSink")
 local Formatter = require("@root/core/Formatter")
 local LogLevel = require("@root/core/LogLevel")
+local LogMode = require("@root/core/LogMode")
 local LogRecord = require("@root/core/LogRecord")
-local Logger = require("@root/core/createLogger")
-local PrettyFormatter = require("@root/formatters/PrettyFormatter")
 local Sink = require("@root/core/Sink")
+local createConsoleSink = require("@root/sinks/createConsoleSink")
 local createDispatcher = require("@root/core/createDispatcher")
+local createLogger = require("@root/core/createLogger")
+local createPrettyFormatter = require("@root/formatters/createPrettyFormatter")
 local createRegistry = require("@root/core/createRegistry")
 local platform = require("@root/platform")
 
 export type LogLevel = LogLevel.LogLevel
+export type LogMode = LogMode.LogMode
 export type LogRecord = LogRecord.LogRecord
-export type Logger = Logger.Logger
-export type Mode = Logger.Mode
+export type Logger = createLogger.Logger
 export type Sink = Sink.Sink
 export type Formatter = Formatter.Formatter
 
@@ -38,9 +39,9 @@ export type CreateLoggerOptions = {
 	-- Minimum level to emit. When omitted, resolves from LOG_LEVEL (Lute) /
 	-- _G.LOG_LEVEL (Roblox), falling back to "info".
 	level: LogLevel?,
-	-- "dev" writes records synchronously like `print`; "prod" batches them and
-	-- writes each sink once per batch. Defaults to "dev".
-	mode: Mode?,
+	-- "Dev" writes records synchronously like `print`. "Prod" batches them and
+	-- writes each sink once per batch. Defaults to "Dev".
+	mode: LogMode?,
 	-- Output targets. Defaults to a single console sink.
 	sinks: { Sink }?,
 	-- Structured context attached to every record from this logger.
@@ -70,39 +71,38 @@ local function resolveLevel(options: CreateLoggerOptions?): LogLevel
 		end
 	end
 
-	return "info"
+	return LogLevel.Info
 end
 
-local function newConsoleSink(options: ConsoleSink.ConsoleSinkOptions?): Sink
-	return ConsoleSink(platform, options)
-end
-
-local function newPrettyFormatter(options: PrettyFormatter.PrettyFormatterOptions?): Formatter
-	return PrettyFormatter(platform, options)
-end
-
--- Creates a new, un-cached logger.
-local function createLogger(name: string, options: CreateLoggerOptions?): Logger
-	return Logger(platform, dispatcher, name, {
+-- Fills in the defaults an un-configured logger needs: a console sink, dev mode,
+-- and a resolved level.
+local function resolveConfig(options: CreateLoggerOptions?): createLogger.LoggerConfig
+	return {
 		level = resolveLevel(options),
-		mode = if options and options.mode then options.mode else "dev",
-		sinks = if options and options.sinks then options.sinks else { newConsoleSink() },
+		mode = if options and options.mode then options.mode else LogMode.Dev,
+		sinks = if options and options.sinks then options.sinks else { createConsoleSink(platform) },
 		fields = if options then options.fields else nil,
-	})
-end
-
--- Returns the cached logger for `name`, creating it (with `options`) on first
--- use. Later calls ignore `options`.
-local function getLogger(name: string, options: CreateLoggerOptions?): Logger
-	return registry.get(name, function()
-		return createLogger(name, options)
-	end)
+	}
 end
 
 return {
-	createLogger = createLogger,
-	getLogger = getLogger,
+	-- Creates a new, un-cached logger.
+	createLogger = function(name: string, options: CreateLoggerOptions?): Logger
+		return createLogger(platform, dispatcher, name, resolveConfig(options))
+	end,
 
-	ConsoleSink = newConsoleSink,
-	PrettyFormatter = newPrettyFormatter,
+	-- Returns the cached logger for `name`, creating it (with `options`) on first
+	-- use. Later calls ignore `options`.
+	getLogger = function(name: string, options: CreateLoggerOptions?): Logger
+		return registry.get(name, function()
+			return createLogger(platform, dispatcher, name, resolveConfig(options))
+		end)
+	end,
+
+	createConsoleSink = function(options: createConsoleSink.ConsoleSinkOptions?): Sink
+		return createConsoleSink(platform, options)
+	end,
+	createPrettyFormatter = function(options: createPrettyFormatter.PrettyFormatterOptions?): Formatter
+		return createPrettyFormatter(platform, options)
+	end,
 }
