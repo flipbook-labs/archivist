@@ -12,8 +12,8 @@ A structured logging library for Luau that runs on both [Lute](https://github.co
 - **`LOG_LEVEL`**: level resolution from the environment on Lute, `_G.LOG_LEVEL` on Roblox
 - **Colorful output**: ANSI-colored console output on Lute; plain `print`/`warn` on Roblox
 - **Structured records**: every entry is a `LogRecord` object (timestamp, level, name, args) that sinks can consume
-- **Sinks**: route records anywhere — console, files (Lute), or your own callback (e.g. an in-app log viewer)
-- **Dev/prod deferral** *(planned)*: sequential `print`-like output in dev, batched non-blocking writes in prod
+- **Sinks**: route records anywhere: console, files (Lute), or your own callback (e.g. an in-app log viewer)
+- **Dev/prod deferral**: sequential `print`-like output in dev; in prod, records batch and each sink is written once per batch instead of once per record
 
 ## Installation
 
@@ -46,15 +46,29 @@ local Archivist = require("@pkg/Archivist")
 local logger = Archivist.createLogger("MyModule")
 
 logger.info("loaded", 3, "stories")
+logger.info("structured data:", { port = 8080, ready = true })
 logger.warn("something looks off")
 logger.err("something broke")
 
+-- Children share the parent's sinks and attach fields to every record:
+local child = logger.child("requests", { requestId = "abc123" })
+child.debug("handling request")
+
+-- Prod mode batches: these queue and flush to each sink as ONE write.
+local batched = Archivist.createLogger("Telemetry", { mode = "Prod" })
+batched.info("queued 1")
+batched.info("queued 2")
+batched.flush() -- optional; pending batches also flush on defer and at exit
+
 -- Show everything, regardless of LOG_LEVEL:
-local verbose = Archivist.createLogger("MyModule", { level = "trace" })
+local verbose = Archivist.createLogger("MyModule", { level = "Trace" })
 ```
 
 The minimum level resolves from, in order: the `level` option, the `LOG_LEVEL`
 environment variable (Lute), `_G.LOG_LEVEL` (Roblox), then defaults to `info`.
+
+`Archivist.getLogger(name)` returns a per-name cached logger so modules can
+share one configured logger without threading it through requires.
 
 ## Development
 
@@ -63,6 +77,7 @@ Archivist uses [Rokit](https://github.com/rojo-rbx/rokit) for toolchain manageme
 ```sh
 rokit install
 lute run example   # run the demo script under Lute
+lute test          # run the unit tests
 lute run build     # build the Roblox model (Archivist.rbxm)
 ```
 

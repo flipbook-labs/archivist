@@ -7,7 +7,18 @@
 	`@lute/*` or Roblox globals directly.
 ]]
 
-export type LogLevel = "trace" | "debug" | "info" | "warn" | "err"
+export type LogLevel = "Trace" | "Debug" | "Info" | "Warn" | "Err"
+
+-- Wraps text in console styling (e.g. ANSI color). Identity on runtimes whose
+-- console doesn't support styling.
+export type Styler = (text: string) -> string
+
+-- Semantic styles: one per level, plus `dim` for de-emphasised extras
+-- (timestamps, fields). Platforms map these to whatever their console renders.
+export type Styles = {
+	levels: { [LogLevel]: Styler },
+	dim: Styler,
+}
 
 export type Platform = {
 	-- Writes a line to standard output (Lute `io.write` / Roblox `print`).
@@ -18,8 +29,26 @@ export type Platform = {
 	now: () -> number,
 	-- Reads an environment variable; always `nil` on Roblox.
 	getEnv: (key: string) -> string?,
-	-- Whether ANSI colour codes are meaningful on this runtime's output.
+	-- Whether the console renders styling; when false, formatters skip styling
+	-- even though `styles` is always safe to call.
 	color: boolean,
+	-- Console styling functions (Lute: richterm ANSI; Roblox: identity).
+	styles: Styles,
+	-- Renders an arbitrary value for human reading; tables are pretty-printed
+	-- (Lute: batteries pp; Roblox: HttpService:JSONEncode with tostring fallback).
+	inspect: (value: any) -> string,
+	-- Encodes a value as JSON (Lute: @std/json; Roblox: HttpService). Throws on
+	-- unencodable input, so callers pcall and fall back.
+	jsonEncode: (value: any) -> string,
+	-- Schedules `callback` to run soon, after the current execution finishes
+	-- (Lute/Roblox `task.defer`). Used to coalesce batched log writes.
+	defer: (callback: () -> ()) -> (),
+	-- Called while batched records are pending: `flush` must run if the process
+	-- is about to terminate (interrupt, shutdown). Returns a release function
+	-- the caller invokes once the pending batch has drained. On Lute the
+	-- registered signal handles hold the event loop open, so releasing promptly
+	-- is what lets the process exit naturally.
+	holdForFlush: (flush: () -> ()) -> () -> (),
 }
 
 return {}
