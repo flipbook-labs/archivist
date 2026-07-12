@@ -46,38 +46,40 @@ local function createDispatcher(platform: types.Platform): Dispatcher
 	local function flush()
 		flushScheduled = false
 
+		if #queue > 0 then
+			local draining = queue
+			queue = {}
+
+			-- Group the drained records per sink, preserving call order, so each
+			-- sink gets exactly one `write` for the whole batch.
+			local sinkBatches: { [SinkT]: { LogRecordT } } = {}
+			local sinkOrder: { SinkT } = {}
+
+			for _, entry in draining do
+				for _, sink in entry.sinks do
+					local batch = sinkBatches[sink]
+					if not batch then
+						batch = {}
+						sinkBatches[sink] = batch
+						table.insert(sinkOrder, sink)
+					end
+					table.insert(batch, entry.record)
+				end
+			end
+
+			for _, sink in sinkOrder do
+				sink.write(sinkBatches[sink])
+			end
+		end
+
+		-- Release the hold only after every sink has been written. On Lute the
+		-- hold is the live SIGINT/SIGTERM handles, so keeping them open across the
+		-- write phase means an interrupt mid-flush still drains the batch instead
+		-- of dropping it.
 		if releaseHold then
 			local release = releaseHold
 			releaseHold = nil
 			release()
-		end
-
-		if #queue == 0 then
-			return
-		end
-
-		local draining = queue
-		queue = {}
-
-		-- Group the drained records per sink, preserving call order, so each
-		-- sink gets exactly one `write` for the whole batch.
-		local sinkBatches: { [SinkT]: { LogRecordT } } = {}
-		local sinkOrder: { SinkT } = {}
-
-		for _, entry in draining do
-			for _, sink in entry.sinks do
-				local batch = sinkBatches[sink]
-				if not batch then
-					batch = {}
-					sinkBatches[sink] = batch
-					table.insert(sinkOrder, sink)
-				end
-				table.insert(batch, entry.record)
-			end
-		end
-
-		for _, sink in sinkOrder do
-			sink.write(sinkBatches[sink])
 		end
 	end
 

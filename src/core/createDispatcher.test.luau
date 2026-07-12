@@ -4,6 +4,7 @@ local test = require("@std/test")
 local LogLevel = require("@root/core/LogLevel")
 local LogMode = require("@root/core/LogMode")
 local LogRecord = require("@root/core/LogRecord")
+local Sink = require("@root/core/Sink")
 local createCaptureSink = require("@root/testing/createCaptureSink")
 local createDispatcher = require("@root/core/createDispatcher")
 local createFakePlatform = require("@root/testing/createFakePlatform")
@@ -147,6 +148,26 @@ test.suite("Dispatcher prod mode", function(suite)
 		expect.eq(#fake.holds, 2)
 		fake.runDeferred()
 		expect.eq(fake.releasedCount(), 2)
+	end)
+
+	suite:case("keeps the hold open until after the sinks are written", function()
+		local fake = createFakePlatform()
+		local dispatcher = createDispatcher(fake.platform)
+
+		local releasedDuringWrite: number? = nil
+		local sink: Sink.Sink = {
+			write = function()
+				releasedDuringWrite = fake.releasedCount()
+			end,
+		}
+
+		dispatcher.dispatch({ sink }, record(LogLevel.Info, "one"), LogMode.Prod)
+		fake.runDeferred()
+
+		-- A signal that arrives mid-write must still flush, so the hold cannot be
+		-- released until every sink has run.
+		expect.eq(releasedDuringWrite, 0)
+		expect.eq(fake.releasedCount(), 1)
 	end)
 
 	suite:case("flushes early when the queue hits the safety cap", function()
