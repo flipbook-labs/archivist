@@ -3,12 +3,8 @@
 
 	Uses only Roblox globals (`print`, `warn`, `task`, `os.time`). The Roblox
 	build swaps this in for `platform/init.luau`; see `.lute/build.luau`.
-
-	selene lints against the plain Luau std and cannot see Roblox globals, hence
-	the targeted allows below.
 ]]
 
--- selene: allow(undefined_variable)
 local HttpService = game:GetService("HttpService")
 
 local types = require("@root/platform/types")
@@ -31,7 +27,6 @@ local platform: types.Platform = {
 		print(line)
 	end,
 	warn = function(line)
-		-- selene: allow(undefined_variable)
 		warn(line)
 	end,
 	now = function()
@@ -62,7 +57,6 @@ local platform: types.Platform = {
 	end,
 	jsonEncode = jsonEncode,
 	defer = function(callback)
-		-- selene: allow(undefined_variable)
 		task.defer(callback)
 	end,
 	holdForFlush = function(flush)
@@ -71,11 +65,9 @@ local platform: types.Platform = {
 		-- (`game:BindToClose` is server-only; plugins and clients skip it).
 		-- Batches on Roblox flush every defer cycle regardless, so little is
 		-- ever pending at shutdown.
-		-- selene: allow(undefined_variable)
 		if not boundFlushes[flush] and typeof(game) == "Instance" then
 			boundFlushes[flush] = true
 			pcall(function()
-				-- selene: allow(undefined_variable, incorrect_standard_library_use)
 				game:BindToClose(flush)
 			end)
 		end
