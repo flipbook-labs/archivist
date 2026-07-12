@@ -24,7 +24,7 @@ test.suite("PrettyFormatter", function(suite)
 		local fake = createFakePlatform()
 		local formatter = PrettyFormatter(fake.platform, { timestamp = false })
 
-		expect.eq(formatter.format(record({})), "[test] [info ] hello")
+		expect.eq(formatter.format(record({})), "[test] [info] hello")
 	end)
 
 	suite:case("prefixes a HH:MM:SS timestamp by default", function()
@@ -42,7 +42,7 @@ test.suite("PrettyFormatter", function(suite)
 
 		local line = formatter.format(record({ args = table.pack("loaded", 3, true) }))
 
-		expect.eq(line, "[test] [info ] loaded 3 true")
+		expect.eq(line, "[test] [info] loaded 3 true")
 	end)
 
 	suite:case("renders nil arguments explicitly", function()
@@ -51,7 +51,7 @@ test.suite("PrettyFormatter", function(suite)
 
 		local line = formatter.format(record({ args = table.pack("value:", nil) }))
 
-		expect.eq(line, "[test] [info ] value: nil")
+		expect.eq(line, "[test] [info] value: nil")
 	end)
 
 	suite:case("pretty-prints table arguments via the platform", function()
@@ -79,7 +79,7 @@ test.suite("PrettyFormatter", function(suite)
 
 		-- The fake platform's color is false, so styling defaults off.
 		expect.never.strContains(plain.format(record({})), "<info>")
-		expect.strContains(colored.format(record({ level = "err" })), "<err>[test] [err  ]</err>")
+		expect.strContains(colored.format(record({ level = "err" })), "<err>[test] [err]</err>")
 	end)
 
 	suite:case("dims the timestamp and fields when color is on", function()
