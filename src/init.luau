@@ -18,7 +18,7 @@ local Formatter = require("@root/core/Formatter")
 local JsonFormatter = require("@root/formatters/JsonFormatter")
 local LogLevel = require("@root/core/LogLevel")
 local LogRecord = require("@root/core/LogRecord")
-local Logger = require("@root/core/Logger")
+local Logger = require("@root/core/createLogger")
 local PrettyFormatter = require("@root/formatters/PrettyFormatter")
 local Sink = require("@root/core/Sink")
 local TransportSink = require("@root/sinks/TransportSink")
@@ -48,7 +48,7 @@ export type CreateLoggerOptions = {
 	-- Output targets. Defaults to a single console sink.
 	sinks: { Sink }?,
 	-- Structured context attached to every record from this logger.
-	fields: { [string]: any }?,
+	fields: { [string]: unknown }?,
 }
 
 -- Resolves the starting level: explicit option, then LOG_LEVEL, then

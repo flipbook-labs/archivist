@@ -21,7 +21,7 @@ export type LogRecord = {
 	-- The arguments passed to the log call, un-stringified.
 	args: PackedArgs,
 	-- Structured context attached via `logger.child`; nil when none.
-	fields: { [string]: any }?,
+	fields: { [string]: unknown }?,
 }
 
 return {}
