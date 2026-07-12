@@ -20,15 +20,6 @@ export type PrettyFormatterOptions = {
 	timestamp: boolean?,
 }
 
--- Pads the level so message columns line up across records ("err  " vs "trace").
-local LEVEL_LABEL: { [types.LogLevel]: string } = {
-	trace = "trace",
-	debug = "debug",
-	info = "info ",
-	warn = "warn ",
-	err = "err  ",
-}
-
 local function identity(text: string): string
 	return text
 end
@@ -49,7 +40,7 @@ local function createPrettyFormatter(platform: types.Platform, options: PrettyFo
 			table.insert(parts, style(platform.styles.dim)(clock))
 		end
 
-		local prefix = `[{record.name}] [{LEVEL_LABEL[record.level]}]`
+		local prefix = `[{record.name}] [{record.level}]`
 		table.insert(parts, style(platform.styles.levels[record.level])(prefix))
 
 		for index = 1, record.args.n do
