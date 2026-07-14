@@ -7,6 +7,7 @@ local createCaptureSink = require("@root/testing/createCaptureSink")
 local createDispatcher = require("@root/core/createDispatcher")
 local createFakePlatform = require("@root/testing/createFakePlatform")
 local createLogger = require("@root/core/createLogger")
+local createTransportSink = require("@root/sinks/createTransportSink")
 
 local function createTestLogger(config: {
 	level: LogLevel.LogLevel?,
@@ -106,5 +107,33 @@ test.suite("Logger children", function(suite)
 
 		expect.eq(#capture.records, 1)
 		expect.eq(#childCapture.records, 0)
+	end)
+end)
+
+test.suite("Logger flush", function(suite)
+	suite:case("flushes a sink's partial buffer below batchSize", function()
+		local fake = createFakePlatform()
+		local dispatcher = createDispatcher(fake.platform)
+		local sends = {}
+		local transport = createTransportSink({
+			batchSize = 100,
+			send = function(records)
+				table.insert(sends, records)
+			end,
+		})
+		local logger = createLogger(fake.platform, dispatcher, "test", {
+			level = LogLevel.Info,
+			mode = LogMode.Dev,
+			sinks = { transport },
+		})
+
+		logger.info("pending")
+		expect.eq(#sends, 0)
+
+		logger.flush()
+
+		expect.eq(#sends, 1)
+		expect.eq(#sends[1], 1)
+		expect.eq(sends[1][1].args[1], "pending")
 	end)
 end)

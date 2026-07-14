@@ -40,7 +40,9 @@ export type Logger = {
 	-- over the parent's fields and attached to every record.
 	child: (name: string?, fields: { [string]: unknown }?) -> Logger,
 
-	-- Forces any batched records (prod mode) out to sinks immediately.
+	-- Drains prod-mode batched records to the sinks, then flushes each sink's
+	-- own buffer (a TransportSink holding fewer than batchSize records). Call
+	-- before shutdown so partial buffers are not dropped.
 	flush: () -> (),
 }
 
@@ -137,6 +139,11 @@ local function createLogger(
 
 		flush = function()
 			dispatcher.flush()
+			for _, sink in sinks do
+				if sink.flush then
+					sink.flush()
+				end
+			end
 		end,
 	}
 
