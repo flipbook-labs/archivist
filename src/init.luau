@@ -16,11 +16,15 @@ local LogLevel = require("@root/core/LogLevel")
 local LogMode = require("@root/core/LogMode")
 local LogRecord = require("@root/core/LogRecord")
 local Sink = require("@root/core/Sink")
+local createCallbackSink = require("@root/sinks/createCallbackSink")
 local createConsoleSink = require("@root/sinks/createConsoleSink")
 local createDispatcher = require("@root/core/createDispatcher")
+local createFileSink = require("@root/sinks/createFileSink")
+local createJsonFormatter = require("@root/formatters/createJsonFormatter")
 local createLogger = require("@root/core/createLogger")
 local createPrettyFormatter = require("@root/formatters/createPrettyFormatter")
 local createRegistry = require("@root/core/createRegistry")
+local createTransportSink = require("@root/sinks/createTransportSink")
 local platform = require("@root/platform")
 
 export type LogLevel = LogLevel.LogLevel
@@ -102,7 +106,19 @@ return {
 	createConsoleSink = function(options: createConsoleSink.ConsoleSinkOptions?): Sink
 		return createConsoleSink(platform, options)
 	end,
+	createCallbackSink = function(callback: (LogRecord) -> ()): Sink
+		return createCallbackSink(callback)
+	end,
+	createFileSink = function(options: createFileSink.FileSinkOptions): Sink
+		return createFileSink(platform, options)
+	end,
+	createTransportSink = function(options: createTransportSink.TransportSinkOptions): Sink
+		return createTransportSink(options)
+	end,
 	createPrettyFormatter = function(options: createPrettyFormatter.PrettyFormatterOptions?): Formatter
 		return createPrettyFormatter(platform, options)
+	end,
+	createJsonFormatter = function(options: createJsonFormatter.JsonFormatterOptions?): Formatter
+		return createJsonFormatter(platform, options)
 	end,
 }

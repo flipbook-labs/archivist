@@ -9,6 +9,12 @@
 
 export type LogLevel = "Trace" | "Debug" | "Info" | "Warn" | "Err"
 
+-- A handle to a file opened for appending; see `Platform.openAppendable`.
+export type AppendHandle = {
+	append: (text: string) -> (),
+	close: () -> (),
+}
+
 -- Wraps text in console styling (e.g. ANSI color). Identity on runtimes whose
 -- console doesn't support styling.
 export type Styler = (text: string) -> string
@@ -49,6 +55,9 @@ export type Platform = {
 	-- registered signal handles hold the event loop open, so releasing promptly
 	-- is what lets the process exit naturally.
 	holdForFlush: (flush: () -> ()) -> () -> (),
+	-- Opens `path` for appending (creating it if absent). Absent on runtimes
+	-- with no filesystem (Roblox), so capability-probe before use.
+	openAppendable: ((path: string) -> AppendHandle)?,
 }
 
 return {}
