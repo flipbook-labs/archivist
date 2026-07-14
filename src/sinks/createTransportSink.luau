@@ -17,6 +17,12 @@
 
 	`send` failures are the caller's to handle (retry, drop, dead-letter);
 	Archivist assumes a `send` that returns.
+
+	The buffer persists across dispatcher drains, so it can sit below `batchSize`
+	indefinitely. Flush-on-exit only drains the dispatcher queue (the process
+	hold releases as soon as that queue empties), not a sink's own buffer, so a
+	partial buffer is not shipped at shutdown on its own. Call `logger.flush()`
+	(or this sink's `flush`) before a short-lived program exits to drain it.
 ]]
 
 local LogRecord = require("@root/core/LogRecord")
