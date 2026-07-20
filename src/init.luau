@@ -15,6 +15,7 @@ local Formatter = require("@root/core/Formatter")
 local LogLevel = require("@root/core/LogLevel")
 local LogMode = require("@root/core/LogMode")
 local LogRecord = require("@root/core/LogRecord")
+local Middleware = require("@root/formatters/Middleware")
 local Sink = require("@root/core/Sink")
 local createCallbackSink = require("@root/sinks/createCallbackSink")
 local createConsoleSink = require("@root/sinks/createConsoleSink")
@@ -25,7 +26,9 @@ local createLogger = require("@root/core/createLogger")
 local createPrettyFormatter = require("@root/formatters/createPrettyFormatter")
 local createRegistry = require("@root/core/createRegistry")
 local createTransportSink = require("@root/sinks/createTransportSink")
+local nameMiddleware = require("@root/formatters/nameMiddleware")
 local platform = require("@root/platform")
+local timestampMiddleware = require("@root/formatters/timestampMiddleware")
 
 export type LogLevel = LogLevel.LogLevel
 export type LogMode = LogMode.LogMode
@@ -33,6 +36,7 @@ export type LogRecord = LogRecord.LogRecord
 export type Logger = createLogger.Logger
 export type Sink = Sink.Sink
 export type Formatter = Formatter.Formatter
+export type Middleware = Middleware.Middleware
 
 -- One dispatcher for the whole program so prod-mode batches flush in global
 -- call order, and one registry backing `getLogger`.
@@ -48,6 +52,9 @@ export type CreateLoggerOptions = {
 	mode: LogMode?,
 	-- Output targets. Defaults to a single console sink.
 	sinks: { Sink }?,
+	-- Transforms pretty-formatted console lines in order. Applies only to the
+	-- default console sink; callers that supply sinks configure their formatters.
+	middleware: { Middleware }?,
 	-- Structured context attached to every record from this logger.
 	fields: { [string]: unknown }?,
 }
@@ -81,10 +88,20 @@ end
 -- Fills in the defaults an un-configured logger needs: a console sink, dev mode,
 -- and a resolved level.
 local function resolveConfig(options: CreateLoggerOptions?): createLogger.LoggerConfig
+	local sinks
+	if options and options.sinks then
+		sinks = options.sinks
+	else
+		local formatter = createPrettyFormatter(platform, {
+			middleware = if options then options.middleware else nil,
+		})
+		sinks = { createConsoleSink(platform, { formatter = formatter }) }
+	end
+
 	return {
 		level = resolveLevel(options),
 		mode = if options and options.mode then options.mode else LogMode.Dev,
-		sinks = if options and options.sinks then options.sinks else { createConsoleSink(platform) },
+		sinks = sinks,
 		fields = if options then options.fields else nil,
 	}
 end
@@ -121,4 +138,8 @@ return {
 	createJsonFormatter = function(options: createJsonFormatter.JsonFormatterOptions?): Formatter
 		return createJsonFormatter(platform, options)
 	end,
+	middleware = table.freeze({
+		name = nameMiddleware,
+		timestamp = timestampMiddleware,
+	}),
 }

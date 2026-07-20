@@ -64,6 +64,42 @@ batched.flush() -- optional; pending batches also flush on defer and at exit
 local verbose = Archivist.createLogger("MyModule", { level = "Trace" })
 ```
 
+### Pretty output middleware
+
+The default console formatter emits the level and message:
+
+```text
+[info] loaded 3 stories
+```
+
+Add the built-in middleware when you want logger names or timestamps:
+
+```luau
+local logger = Archivist.createLogger("MyModule", {
+	middleware = {
+		Archivist.middleware.name,
+		Archivist.middleware.timestamp,
+	},
+})
+```
+
+Middleware runs in declaration order. Each function receives the formatted line and a context containing the structured record, platform, color setting, and a color-aware `style` helper. It can prepend, append, or replace text.
+
+The logger-level `middleware` option configures its default console sink. When you provide `sinks`, pass middleware to the pretty formatter instead:
+
+```luau
+local formatter = Archivist.createPrettyFormatter({
+	middleware = {
+		Archivist.middleware.name,
+	},
+})
+local logger = Archivist.createLogger("MyModule", {
+	sinks = {
+		Archivist.createConsoleSink({ formatter = formatter }),
+	},
+})
+```
+
 ### Sinks
 
 ```luau
@@ -91,10 +127,7 @@ local logger = Archivist.createLogger("App", {
 })
 ```
 
-Formatters control how text-oriented sinks render records: `createPrettyFormatter`
-(human-readable, optional ANSI color) and `createJsonFormatter` (one JSON object
-per line). Sinks that consume records structurally (`createCallbackSink`,
-`createTransportSink`) bypass formatting entirely.
+Formatters control how text-oriented sinks render records: `createPrettyFormatter` (human-readable, optional ANSI color and middleware) and `createJsonFormatter` (one JSON object per line). Sinks that consume records structurally (`createCallbackSink`, `createTransportSink`) bypass formatting entirely.
 
 The minimum level resolves from, in order: the `level` option, the `LOG_LEVEL`
 environment variable (Lute), `_G.LOG_LEVEL` (Roblox), then defaults to `info`.

@@ -9,7 +9,7 @@ local createPrettyFormatter = require("@root/formatters/createPrettyFormatter")
 local function record(overrides: {
 	level: LogLevel.LogLevel?,
 	args: LogRecord.PackedArgs?,
-	fields: { [string]: any }?,
+	fields: { [string]: unknown }?,
 }): LogRecord.LogRecord
 	return {
 		timestamp = 1750000000,
@@ -21,43 +21,65 @@ local function record(overrides: {
 end
 
 test.suite("PrettyFormatter", function(suite)
-	suite:case("renders name, level, and message", function()
-		local fake = createFakePlatform()
-		local formatter = createPrettyFormatter(fake.platform, { timestamp = false })
-
-		expect.eq(formatter.format(record({})), "[test] [info] hello")
-	end)
-
-	suite:case("prefixes a HH:MM:SS timestamp by default", function()
+	suite:case("renders the level and message without decorations by default", function()
 		local fake = createFakePlatform()
 		local formatter = createPrettyFormatter(fake.platform)
 
-		local line = formatter.format(record({}))
+		expect.eq(formatter.format(record({})), "[info] hello")
+	end)
 
-		expect.that(string.find(line, "^%d%d:%d%d:%d%d %[test%]") ~= nil, line)
+	suite:case("applies middleware in order", function()
+		local fake = createFakePlatform()
+		local formatter = createPrettyFormatter(fake.platform, {
+			middleware = {
+				function(line)
+					return `before {line}`
+				end,
+				function(line)
+					return `{line} after`
+				end,
+			},
+		})
+
+		expect.eq(formatter.format(record({})), "before [info] hello after")
+	end)
+
+	suite:case("gives middleware the record and color-aware styles", function()
+		local fake = createFakePlatform()
+		local formatter = createPrettyFormatter(fake.platform, {
+			color = true,
+			middleware = {
+				function(line, context)
+					local name = context.style(context.platform.styles.dim)(`[{context.record.name}]`)
+					return `{name} {line}`
+				end,
+			},
+		})
+
+		expect.eq(formatter.format(record({ level = LogLevel.Err })), "<dim>[test]</dim> <err>[err]</err> hello")
 	end)
 
 	suite:case("joins varargs with spaces, including non-strings", function()
 		local fake = createFakePlatform()
-		local formatter = createPrettyFormatter(fake.platform, { timestamp = false })
+		local formatter = createPrettyFormatter(fake.platform)
 
 		local line = formatter.format(record({ args = table.pack("loaded", 3, true) }))
 
-		expect.eq(line, "[test] [info] loaded 3 true")
+		expect.eq(line, "[info] loaded 3 true")
 	end)
 
 	suite:case("renders nil arguments explicitly", function()
 		local fake = createFakePlatform()
-		local formatter = createPrettyFormatter(fake.platform, { timestamp = false })
+		local formatter = createPrettyFormatter(fake.platform)
 
 		local line = formatter.format(record({ args = table.pack("value:", nil) }))
 
-		expect.eq(line, "[test] [info] value: nil")
+		expect.eq(line, "[info] value: nil")
 	end)
 
 	suite:case("pretty-prints table arguments via the platform", function()
 		local fake = createFakePlatform()
-		local formatter = createPrettyFormatter(fake.platform, { timestamp = false })
+		local formatter = createPrettyFormatter(fake.platform)
 
 		local line = formatter.format(record({ args = table.pack({ port = 8080 }) }))
 
@@ -66,7 +88,7 @@ test.suite("PrettyFormatter", function(suite)
 
 	suite:case("appends fields after the message", function()
 		local fake = createFakePlatform()
-		local formatter = createPrettyFormatter(fake.platform, { timestamp = false })
+		local formatter = createPrettyFormatter(fake.platform)
 
 		local line = formatter.format(record({ fields = { requestId = "abc" } }))
 
@@ -75,21 +97,20 @@ test.suite("PrettyFormatter", function(suite)
 
 	suite:case("styles by level only when color is on", function()
 		local fake = createFakePlatform()
-		local plain = createPrettyFormatter(fake.platform, { timestamp = false })
-		local colored = createPrettyFormatter(fake.platform, { timestamp = false, color = true })
+		local plain = createPrettyFormatter(fake.platform)
+		local colored = createPrettyFormatter(fake.platform, { color = true })
 
 		-- The fake platform's color is false, so styling defaults off.
 		expect.never.strContains(plain.format(record({})), "<info>")
-		expect.strContains(colored.format(record({ level = LogLevel.Err })), "<err>[test] [err]</err>")
+		expect.strContains(colored.format(record({ level = LogLevel.Err })), "<err>[err]</err>")
 	end)
 
-	suite:case("dims the timestamp and fields when color is on", function()
+	suite:case("dims fields when color is on", function()
 		local fake = createFakePlatform()
 		local formatter = createPrettyFormatter(fake.platform, { color = true })
 
 		local line = formatter.format(record({ fields = { a = 1 } }))
 
-		expect.that(string.find(line, "^<dim>%d%d:%d%d:%d%d</dim>") ~= nil, line)
 		expect.strContains(line, "<dim>{")
 	end)
 end)

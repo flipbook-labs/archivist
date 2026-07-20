@@ -1,7 +1,7 @@
 --[[
 	Human-readable, optionally styled, single-line-per-record formatter:
 
-		12:30:45 [StorytellerStore] [info] loaded storybook Sample.storybook
+		[info] loaded storybook Sample.storybook
 
 	Styling and value rendering come from the platform: richterm ANSI and the
 	pp pretty-printer on Lute, identity styling and JSON rendering on Roblox.
@@ -9,6 +9,7 @@
 
 local Formatter = require("@root/core/Formatter")
 local LogRecord = require("@root/core/LogRecord")
+local Middleware = require("@root/formatters/Middleware")
 local types = require("@root/platform/types")
 
 export type PrettyFormatterOptions = {
@@ -16,8 +17,7 @@ export type PrettyFormatterOptions = {
 	-- off explicitly when pretty output is headed somewhere ANSI-hostile
 	-- (e.g. a file).
 	color: boolean?,
-	-- Prefix records with a HH:MM:SS wall-clock timestamp. Defaults to true.
-	timestamp: boolean?,
+	middleware: { Middleware.Middleware }?,
 }
 
 local function identity(text: string): string
@@ -26,7 +26,7 @@ end
 
 local function createPrettyFormatter(platform: types.Platform, options: PrettyFormatterOptions?): Formatter.Formatter
 	local color = if options and options.color ~= nil then options.color else platform.color
-	local withTimestamp = if options and options.timestamp ~= nil then options.timestamp else true
+	local middleware = if options and options.middleware then options.middleware else {}
 
 	local function style(styler: types.Styler): types.Styler
 		return if color then styler else identity
@@ -34,14 +34,7 @@ local function createPrettyFormatter(platform: types.Platform, options: PrettyFo
 
 	local function format(record: LogRecord.LogRecord): string
 		local parts = {}
-
-		if withTimestamp then
-			local clock = os.date("%H:%M:%S", record.timestamp) :: string
-			table.insert(parts, style(platform.styles.dim)(clock))
-		end
-
-		local prefix = `[{record.name}] [{record.level:lower()}]`
-		table.insert(parts, style(platform.styles.levels[record.level])(prefix))
+		table.insert(parts, style(platform.styles.levels[record.level])(`[{record.level:lower()}]`))
 
 		for index = 1, record.args.n do
 			table.insert(parts, platform.inspect(record.args[index]))
@@ -51,7 +44,18 @@ local function createPrettyFormatter(platform: types.Platform, options: PrettyFo
 			table.insert(parts, style(platform.styles.dim)(platform.inspect(record.fields)))
 		end
 
-		return table.concat(parts, " ")
+		local line = table.concat(parts, " ")
+		local context: Middleware.FormatContext = {
+			record = record,
+			platform = platform,
+			color = color,
+			style = style,
+		}
+		for _, applyMiddleware in middleware do
+			line = applyMiddleware(line, context)
+		end
+
+		return line
 	end
 
 	return {

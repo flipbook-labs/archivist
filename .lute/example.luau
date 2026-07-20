@@ -24,3 +24,11 @@ batched.info("queued 3")
 
 local verbose = Archivist.createLogger("verbose", { level = "Trace" })
 verbose.trace("...but trace shows when the level is lowered")
+
+local decorated = Archivist.createLogger("example", {
+	middleware = {
+		Archivist.middleware.name,
+		Archivist.middleware.timestamp,
+	},
+})
+decorated.info("names and timestamps are opt-in")
