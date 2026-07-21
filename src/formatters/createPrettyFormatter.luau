@@ -17,6 +17,8 @@ export type PrettyFormatterOptions = {
 	-- off explicitly when pretty output is headed somewhere ANSI-hostile
 	-- (e.g. a file).
 	color: boolean?,
+	-- Applied to each formatted line in order, after the base `[level] message`
+	-- rendering. Defaults to no transforms.
 	middleware: { Middleware.Middleware }?,
 }
 
