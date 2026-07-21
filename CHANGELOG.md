@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 
+## v0.2.0
+
+### Changes
+
+- Render pretty logs as `[level] message` by default and add opt-in name and timestamp middleware.
+
+
 ## v0.1.0
 
 ### Changes
