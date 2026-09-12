@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 
+## v0.2.1
+
+### Changes
+
+- Release automation reads the public Flipbook Backend App Client ID from an organization variable.
+
+
 ## v0.2.0
 
 ### Changes
