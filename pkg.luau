@@ -1,7 +1,7 @@
 return {
 	package = {
 		name = "Archivist",
-		version = "0.2.0",
+		version = "0.3.0",
 		dependencies = {
 			Lute = {
 				rev = "v1.0.1-nightly.20261115",
