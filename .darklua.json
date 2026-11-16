@@ -3,7 +3,10 @@
     {
       "rule": "convert_require",
       "current": {
-        "name": "luau"
+        "name": "luau",
+        "aliases": {
+          "@root": "./src"
+        }
       },
       "target": {
         "name": "roblox",

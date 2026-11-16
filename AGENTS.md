@@ -9,18 +9,18 @@ Complete every step below before you write any code, tests, changelog entries, o
 1. Install the toolchain and dependencies:
 
    ```sh
-   rokit install && lute pkg install
+   rokit install && lute run install
    ```
 
-   `rokit install` puts `lute`, `luau-lsp`, `stylua`, and `selene` on PATH. `lute pkg install` fetches the Loom dependencies into `~/.loom/store`. The shared skills library is a dev dependency, so it lands there for you to read but is not shipped with the package. Without this step the skills are not on disk.
+   `rokit install` puts `lute`, `luau-lsp`, `stylua`, and `selene` on PATH. `lute run install` fetches the Loom dependencies into `~/.loom/store` and writes their paths into the aliases in `.config.luau`. The shared skills library is a dev dependency, so it lands there for you to read but is not shipped with the package. Without this step the skills are not on disk.
 
 2. Resolve the concrete skills path from the pinned version (do not guess it):
 
    ```sh
-   ls -d ~/.loom/store/AgentSkills@*
+   echo ~/.loom/store/$(sed -n 's|.*installPath = "@pkg/\(agent-skills--[^"]*\)".*|\1|p' pkg.lock.luau)
    ```
 
-   The store can hold more than one version, so match the `rev` pinned for `AgentSkills` in [`loom.config.luau`](loom.config.luau): the path is `~/.loom/store/AgentSkills@<rev>`. Use it wherever `<skills>` appears below, and ignore any other versions the listing prints.
+   `pkg.lock.luau` records where the `AgentSkills` rev pinned in [`pkg.luau`](pkg.luau) was installed, with `@pkg/` standing for `~/.loom/store/`. Use the printed path wherever `<skills>` appears below.
 
 3. Read the routing index at `<skills>/AGENTS.md` in full. Its **Project Skills** section lists every skill with a trigger-rich one-liner, so you know what exists before you start. This read is unconditional.
 
@@ -44,7 +44,7 @@ Skills are living documents. When your work here contradicts a skill (a renamed 
 ## Repo specifics
 
 - Toolchain is managed with [Rokit](https://github.com/rojo-rbx/rokit). Run `rokit install` once to get `lute`, `luau-lsp`, `stylua`, and `selene` on PATH.
-- `lute pkg install` fetches the Loom dependencies. `lute run --list` shows the repo scripts: `build`, `lint`, `analyze`, and `example`.
+- `lute run install` fetches the Loom dependencies and writes their aliases. `lute run --list` shows the repo scripts: `build`, `lint`, `analyze`, and `example`.
 - The library targets both Lute and Roblox from one source, so keep runtime-specific code behind the existing detection rather than assuming one host.
 - Tests are `*.spec.luau` files alongside the code they cover. Run the suite with `lute test`.
 - Releases are handled by the [Changewrite](https://github.com/flipbook-labs/changewrite) action. Unreleased entries live as partials in [`.changes/`](.changes) and are assembled into [`CHANGELOG.md`](CHANGELOG.md) at release time. Add a `.changes/` entry for any user-facing change.

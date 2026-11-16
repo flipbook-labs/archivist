@@ -19,17 +19,17 @@ A structured logging library for Luau that runs on both [Lute](https://github.co
 
 ### Lute (Loom)
 
-Add to your `loom.config.luau` dependencies:
+Add to your `pkg.luau` dependencies. This needs a Lute nightly newer than `1.0.1-nightly.20261031`.
 
 ```luau
 Archivist = {
-	rev = "v0.1.0",
+	rev = "v0.3.0",
 	sourceKind = "github",
 	source = "https://github.com/flipbook-labs/archivist",
 },
 ```
 
-Then run `lute pkg install`.
+Then run `lute pkg install`. Lute installs Archivist into `~/.loom/store` and records the folder as `installPath` in `pkg.lock.luau`, with `@pkg/` standing for `~/.loom/store/`. Point an alias in your `.config.luau` at that folder to require it.
 
 ### Roblox (Wally)
 
