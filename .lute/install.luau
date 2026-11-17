@@ -1,49 +1,74 @@
 local fs = require("@std/fs")
 local luau = require("@std/luau")
+local path = require("@std/path")
+local process = require("@std/process")
 
-local run = require("./lib/run")
-
-local CONFIG_PATH = ".config.luau"
 local LOCKFILE_PATH = "pkg.lock.luau"
+local VENDOR_PATH = "LuauPackages"
 
 -- `lute pkg install` puts each dependency in the Loom store, `~/.loom/store`,
--- under a folder whose name includes hashes of its source and rev. A dependency
--- with a `target` in `pkg.luau` installs only that subfolder, like Lute's
--- `batteries`. The lockfile records where each one landed, but `lute check` and
--- editors read aliases only from `.config.luau`. So after installing, this
--- copies each recorded path into that dependency's alias. Keys are aliases in
--- `.config.luau`, and values are dependency names in `pkg.luau`.
-local DEPENDENCY_ALIASES: { [string]: string } = {
-	batteries = "Lute",
-}
+-- under a folder whose name includes hashes of its source and rev. Requires
+-- resolve only through aliases in `.config.luau`, which can't name a dependency
+-- from the lockfile. So after installing, this copies each dependency into
+-- `LuauPackages/<name>`, using its name from `pkg.luau`, and `.config.luau`
+-- aliases those folders. https://github.com/flipbook-labs/flipbook/issues/689
+-- tracks removing this once Lute resolves dependencies by name.
+--
+-- A vendored package's own `.config.luau` aliases its dependencies the same
+-- way, as `./LuauPackages/<name>` inside its folder. So each package's
+-- dependencies are copied into its own `LuauPackages/`, all the way down.
+--
+-- This script uses only `@std` so other repos can copy it as is, before any of
+-- their dependencies are on disk.
 
 type Lockfile = {
 	dependencies: { [string]: string },
 	devDependencies: { [string]: string }?,
-	packages: { [string]: { installPath: string } },
+	packages: { [string]: { installPath: string, dependencies: { [string]: string } } },
 }
 
-local function getStorePath(lockfile: Lockfile, name: string): string
-	local key = lockfile.dependencies[name] or (lockfile.devDependencies and lockfile.devDependencies[name])
-	assert(key, `{name} is not a dependency in {LOCKFILE_PATH}`)
-
-	-- The lockfile writes `@pkg/` for the store, and the path of a dependency
-	-- without a target ends in `/.`.
+-- The lockfile writes `@pkg/` for the store, and the path of a dependency
+-- without a `target` ends in `/.`.
+local function getStorePath(lockfile: Lockfile, key: string): path.Path
 	local installPath = lockfile.packages[key].installPath
-	return (installPath:gsub("^@pkg/", "~/.loom/store/"):gsub("/%.$", ""))
+	local relative = installPath:gsub("^@pkg/", ""):gsub("/%.$", "")
+	return path.join(process.homedir(), ".loom", "store", relative)
 end
 
-run({ "lute", "pkg", "install" })
+local function copyDirectory(src: path.Path, dest: path.Path)
+	fs.createDirectory(dest, { makeParents = true })
+	for _, entry in fs.listDirectory(src) do
+		local from = path.join(src, entry.name)
+		local to = path.join(dest, entry.name)
+		if entry.type == "dir" then
+			copyDirectory(from, to)
+		else
+			fs.copy(from, to)
+		end
+	end
+end
+
+local function vendor(lockfile: Lockfile, key: string, dest: path.Path)
+	copyDirectory(getStorePath(lockfile, key), dest)
+	for name, dependencyKey in lockfile.packages[key].dependencies do
+		vendor(lockfile, dependencyKey, path.join(dest, VENDOR_PATH, name))
+	end
+end
+
+local result = process.run({ "lute", "pkg", "install" }, { stdio = "inherit" })
+assert(result.ok, "lute pkg install failed")
 
 local lockfile: Lockfile = luau.loadModule(LOCKFILE_PATH)
-local config = fs.readFileToString(CONFIG_PATH)
 
-for alias, name in DEPENDENCY_ALIASES do
-	local storePath = getStorePath(lockfile, name)
-	local updated, count = config:gsub(`(%f[%w]{alias}%s*=%s*")[^"]*(")`, `%1{storePath}%2`)
-	assert(count == 1, `Expected one "{alias}" alias in {CONFIG_PATH}, found {count}`)
-	config = updated
+-- Clearing the folder first drops dependencies that `pkg.luau` no longer lists.
+if fs.exists(VENDOR_PATH) then
+	fs.removeDirectory(VENDOR_PATH, { recursive = true })
 end
 
-fs.writeStringToFile(CONFIG_PATH, config)
-print(`wrote dependency aliases to {CONFIG_PATH}`)
+for _, dependencies in { lockfile.dependencies, lockfile.devDependencies or {} } do
+	for name, key in dependencies do
+		vendor(lockfile, key, path.join(VENDOR_PATH, name))
+	end
+end
+
+print(`Vendored dependencies into {VENDOR_PATH}`)

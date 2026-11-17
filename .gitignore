@@ -1,4 +1,5 @@
 /Packages
+/LuauPackages
 /dist
 /build-tmp
 /sourcemap*.json

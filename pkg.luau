@@ -3,7 +3,7 @@ return {
 		name = "Archivist",
 		version = "0.3.0",
 		dependencies = {
-			Lute = {
+			Batteries = {
 				rev = "v1.0.1-nightly.20261115",
 				sourceKind = "github",
 				source = "https://github.com/luau-lang/lute",
