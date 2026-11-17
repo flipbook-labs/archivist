@@ -1,6 +1,6 @@
 {
   "luau-lsp.ignoreGlobs": [
     "**/.lute/typedefs/**",
-    "**/LuauPackages/**"
+    "**/.loom/store/**"
   ]
 }

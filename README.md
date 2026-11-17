@@ -29,9 +29,7 @@ Archivist = {
 },
 ```
 
-Then run `lute pkg install`. Lute installs Archivist into `~/.loom/store` and records the folder as `installPath` in `pkg.lock.luau`, with `@pkg/` standing for `~/.loom/store/`. Copy that folder into your project and point an alias in your `.config.luau` at the copy to require it.
-
-Archivist's own `.config.luau` resolves `@batteries` from `LuauPackages/Batteries` inside its folder, so copy Lute's `batteries` there too. Archivist's [`.lute/install.luau`](.lute/install.luau) does both copies from the lockfile, and you can reuse it as is.
+Then run `lute pkg install`. Lute installs Archivist into `~/.loom/store` and records the folder as `installPath` in `pkg.lock.luau`, with `@pkg/` standing for `~/.loom/store/`. Point an alias in your `.config.luau` at that folder to require it.
 
 ### Roblox (Wally)
 
