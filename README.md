@@ -22,7 +22,7 @@ A structured logging library for Luau that runs on both [Lute](https://github.co
 Add to your `pkg.luau` dependencies. This needs a Lute nightly newer than `1.0.1-nightly.20261031`.
 
 ```luau
-Archivist = {
+archivist = {
 	rev = "v0.3.0",
 	sourceKind = "github",
 	source = "https://github.com/flipbook-labs/archivist",
