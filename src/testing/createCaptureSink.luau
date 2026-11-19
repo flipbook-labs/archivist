@@ -5,8 +5,8 @@
 	`capture.sink` where a `Sink` is expected without fighting table exactness.
 ]]
 
-local LogRecord = require("@root/core/LogRecord")
-local Sink = require("@root/core/Sink")
+local LogRecord = require("../core/LogRecord")
+local Sink = require("../core/Sink")
 
 export type CaptureSink = {
 	sink: Sink.Sink,

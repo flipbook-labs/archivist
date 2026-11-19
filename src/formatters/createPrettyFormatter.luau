@@ -7,10 +7,10 @@
 	pp pretty-printer on Lute, identity styling and JSON rendering on Roblox.
 ]]
 
-local Formatter = require("@root/core/Formatter")
-local LogRecord = require("@root/core/LogRecord")
-local Middleware = require("@root/formatters/Middleware")
-local types = require("@root/platform/types")
+local Formatter = require("../core/Formatter")
+local LogRecord = require("../core/LogRecord")
+local Middleware = require("./Middleware")
+local types = require("../platform/types")
 
 export type PrettyFormatterOptions = {
 	-- Apply the platform's console styling. Defaults to `platform.color`; turn

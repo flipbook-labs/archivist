@@ -4,7 +4,7 @@
 	don't use one.
 ]]
 
-local LogRecord = require("@root/core/LogRecord")
+local LogRecord = require("./LogRecord")
 
 export type Formatter = {
 	format: (record: LogRecord.LogRecord) -> string,

@@ -25,8 +25,8 @@
 	(or this sink's `flush`) before a short-lived program exits to drain it.
 ]]
 
-local LogRecord = require("@root/core/LogRecord")
-local Sink = require("@root/core/Sink")
+local LogRecord = require("../core/LogRecord")
+local Sink = require("../core/Sink")
 
 local DEFAULT_BATCH_SIZE = 50
 

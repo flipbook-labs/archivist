@@ -6,4 +6,4 @@
 	the tree entirely, so no `@lute/*` require ever reaches darklua or Roblox.
 ]]
 
-return require("@root/platform/lute")
+return require("@self/lute")

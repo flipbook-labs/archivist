@@ -15,10 +15,10 @@
 	that release is what lets the process exit naturally.
 ]]
 
-local LogMode = require("@root/core/LogMode")
-local LogRecord = require("@root/core/LogRecord")
-local Sink = require("@root/core/Sink")
-local types = require("@root/platform/types")
+local LogMode = require("./LogMode")
+local LogRecord = require("./LogRecord")
+local Sink = require("./Sink")
+local types = require("../platform/types")
 
 type LogModeT = LogMode.LogMode
 type LogRecordT = LogRecord.LogRecord

@@ -4,11 +4,11 @@ local path = require("@std/path")
 local system = require("@std/system")
 local test = require("@std/test")
 
-local LogLevel = require("@root/core/LogLevel")
-local LogRecord = require("@root/core/LogRecord")
-local createFakePlatform = require("@root/testing/createFakePlatform")
-local createFileSink = require("@root/sinks/createFileSink")
-local lutePlatform = require("@root/platform/lute")
+local LogLevel = require("../core/LogLevel")
+local LogRecord = require("../core/LogRecord")
+local createFakePlatform = require("../testing/createFakePlatform")
+local createFileSink = require("./createFileSink")
+local lutePlatform = require("../platform/lute")
 
 local function record(message: string): LogRecord.LogRecord
 	return {

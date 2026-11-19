@@ -1,10 +1,10 @@
 local expect = require("@std/test/assert")
 local test = require("@std/test")
 
-local LogLevel = require("@root/core/LogLevel")
-local LogRecord = require("@root/core/LogRecord")
-local createFakePlatform = require("@root/testing/createFakePlatform")
-local createPrettyFormatter = require("@root/formatters/createPrettyFormatter")
+local LogLevel = require("../core/LogLevel")
+local LogRecord = require("../core/LogRecord")
+local createFakePlatform = require("../testing/createFakePlatform")
+local createPrettyFormatter = require("./createPrettyFormatter")
 
 local function record(overrides: {
 	level: LogLevel.LogLevel?,

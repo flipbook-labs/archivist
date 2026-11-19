@@ -1,5 +1,5 @@
-local LogRecord = require("@root/core/LogRecord")
-local types = require("@root/platform/types")
+local LogRecord = require("../core/LogRecord")
+local types = require("../platform/types")
 
 export type FormatContext = {
 	record: LogRecord.LogRecord,

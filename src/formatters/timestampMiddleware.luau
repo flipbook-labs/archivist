@@ -1,4 +1,4 @@
-local Middleware = require("@root/formatters/Middleware")
+local Middleware = require("./Middleware")
 
 local function timestampMiddleware(line: string, context: Middleware.FormatContext): string
 	local clock = os.date("%H:%M:%S", context.record.timestamp) :: string

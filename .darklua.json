@@ -4,9 +4,7 @@
       "rule": "convert_require",
       "current": {
         "name": "luau",
-        "aliases": {
-          "@root": "./src"
-        }
+        "aliases": {}
       },
       "target": {
         "name": "roblox",
