@@ -2,7 +2,7 @@
 	Archivist: a structured logging library for Luau that runs on both Lute
 	and Roblox.
 
-	`require` resolves the platform seam (`@root/platform`) to the Lute or
+	`require` resolves the platform seam (`@self/platform`) to the Lute or
 	Roblox implementation depending on which build this is; everything else is
 	portable and receives the platform by injection.
 
@@ -11,24 +11,24 @@
 		logger.info("loaded", count, "stories")
 ]]
 
-local Formatter = require("@root/core/Formatter")
-local LogLevel = require("@root/core/LogLevel")
-local LogMode = require("@root/core/LogMode")
-local LogRecord = require("@root/core/LogRecord")
-local Middleware = require("@root/formatters/Middleware")
-local Sink = require("@root/core/Sink")
-local createCallbackSink = require("@root/sinks/createCallbackSink")
-local createConsoleSink = require("@root/sinks/createConsoleSink")
-local createDispatcher = require("@root/core/createDispatcher")
-local createFileSink = require("@root/sinks/createFileSink")
-local createJsonFormatter = require("@root/formatters/createJsonFormatter")
-local createLogger = require("@root/core/createLogger")
-local createPrettyFormatter = require("@root/formatters/createPrettyFormatter")
-local createRegistry = require("@root/core/createRegistry")
-local createTransportSink = require("@root/sinks/createTransportSink")
-local nameMiddleware = require("@root/formatters/nameMiddleware")
-local platform = require("@root/platform")
-local timestampMiddleware = require("@root/formatters/timestampMiddleware")
+local Formatter = require("@self/core/Formatter")
+local LogLevel = require("@self/core/LogLevel")
+local LogMode = require("@self/core/LogMode")
+local LogRecord = require("@self/core/LogRecord")
+local Middleware = require("@self/formatters/Middleware")
+local Sink = require("@self/core/Sink")
+local createCallbackSink = require("@self/sinks/createCallbackSink")
+local createConsoleSink = require("@self/sinks/createConsoleSink")
+local createDispatcher = require("@self/core/createDispatcher")
+local createFileSink = require("@self/sinks/createFileSink")
+local createJsonFormatter = require("@self/formatters/createJsonFormatter")
+local createLogger = require("@self/core/createLogger")
+local createPrettyFormatter = require("@self/formatters/createPrettyFormatter")
+local createRegistry = require("@self/core/createRegistry")
+local createTransportSink = require("@self/sinks/createTransportSink")
+local nameMiddleware = require("@self/formatters/nameMiddleware")
+local platform = require("@self/platform")
+local timestampMiddleware = require("@self/formatters/timestampMiddleware")
 
 export type LogLevel = LogLevel.LogLevel
 export type LogMode = LogMode.LogMode
