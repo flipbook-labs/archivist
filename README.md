@@ -32,7 +32,7 @@ archivist = {
 Then run `lute pkg install --vendor`. Lute copies Archivist into `.lpm/archivist@v0.3.0`, with its dependencies in folders beside it, and your code requires it as `@lpm/archivist@v0.3.0`.
 
 > [!NOTE]
-> Projects using Archivist vendor its dependencies with `lute pkg install --vendor` (Lute `1.0.1-nightly.20261117` or newer) and define `lpm = "./.lpm"` in their `.config.luau`, because Archivist requires its dependencies through that alias. [flipbook-labs/infra#43](https://github.com/flipbook-labs/infra/issues/43) tracks dropping this requirement.
+> Projects using Archivist vendor its dependencies with `lute pkg install --vendor` (Lute `1.0.1-nightly.20261117` or newer) and define `lpm = "./.lpm"` in their `.config.luau`, because Archivist requires its dependencies through that alias. [flipbook-labs/flipbook#694](https://github.com/flipbook-labs/flipbook/issues/694) tracks dropping this requirement.
 
 ### Roblox (Wally)
 
