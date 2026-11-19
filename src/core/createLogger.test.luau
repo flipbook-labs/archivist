@@ -1,13 +1,13 @@
 local expect = require("@std/test/assert")
 local test = require("@std/test")
 
-local LogLevel = require("./LogLevel")
-local LogMode = require("./LogMode")
-local createCaptureSink = require("../testing/createCaptureSink")
-local createDispatcher = require("./createDispatcher")
-local createFakePlatform = require("../testing/createFakePlatform")
-local createLogger = require("./createLogger")
-local createTransportSink = require("../sinks/createTransportSink")
+local LogLevel = require("@root/core/LogLevel")
+local LogMode = require("@root/core/LogMode")
+local createCaptureSink = require("@root/testing/createCaptureSink")
+local createDispatcher = require("@root/core/createDispatcher")
+local createFakePlatform = require("@root/testing/createFakePlatform")
+local createLogger = require("@root/core/createLogger")
+local createTransportSink = require("@root/sinks/createTransportSink")
 
 local function createTestLogger(config: {
 	level: LogLevel.LogLevel?,

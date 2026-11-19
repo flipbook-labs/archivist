@@ -16,7 +16,7 @@
 local json = require("@std/json")
 local pp = require("@lpm/batteries@v1.0.1-nightly.20261115/pp")
 
-local types = require("../platform/types")
+local types = require("@root/platform/types")
 
 local function marker(name: string): types.Styler
 	return function(text)

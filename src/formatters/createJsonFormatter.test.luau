@@ -2,10 +2,10 @@ local expect = require("@std/test/assert")
 local json = require("@std/json")
 local test = require("@std/test")
 
-local LogLevel = require("../core/LogLevel")
-local LogRecord = require("../core/LogRecord")
-local createFakePlatform = require("../testing/createFakePlatform")
-local createJsonFormatter = require("./createJsonFormatter")
+local LogLevel = require("@root/core/LogLevel")
+local LogRecord = require("@root/core/LogRecord")
+local createFakePlatform = require("@root/testing/createFakePlatform")
+local createJsonFormatter = require("@root/formatters/createJsonFormatter")
 
 local function record(overrides: {
 	args: LogRecord.PackedArgs?,

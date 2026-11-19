@@ -8,11 +8,11 @@
 	log files are machine-consumable.
 ]]
 
-local Formatter = require("../core/Formatter")
-local LogRecord = require("../core/LogRecord")
-local Sink = require("../core/Sink")
-local createJsonFormatter = require("../formatters/createJsonFormatter")
-local types = require("../platform/types")
+local Formatter = require("@root/core/Formatter")
+local LogRecord = require("@root/core/LogRecord")
+local Sink = require("@root/core/Sink")
+local createJsonFormatter = require("@root/formatters/createJsonFormatter")
+local types = require("@root/platform/types")
 
 export type FileSinkOptions = {
 	path: string,

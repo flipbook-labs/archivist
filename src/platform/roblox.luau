@@ -7,7 +7,7 @@
 
 local HttpService = game:GetService("HttpService")
 
-local types = require("./types")
+local types = require("@root/platform/types")
 
 -- `holdForFlush` is called once per batch window but `game:BindToClose` has no
 -- unbind, so bind each distinct flush function only once for the session.

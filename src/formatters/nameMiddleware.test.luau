@@ -1,10 +1,10 @@
 local expect = require("@std/test/assert")
 local test = require("@std/test")
 
-local LogLevel = require("../core/LogLevel")
-local createFakePlatform = require("../testing/createFakePlatform")
-local createPrettyFormatter = require("./createPrettyFormatter")
-local nameMiddleware = require("./nameMiddleware")
+local LogLevel = require("@root/core/LogLevel")
+local createFakePlatform = require("@root/testing/createFakePlatform")
+local createPrettyFormatter = require("@root/formatters/createPrettyFormatter")
+local nameMiddleware = require("@root/formatters/nameMiddleware")
 
 test.suite("nameMiddleware", function(suite)
 	suite:case("prepends the logger name styled by level", function()

@@ -11,8 +11,8 @@
 	createTransportSink when the destination genuinely wants batches.
 ]]
 
-local LogRecord = require("../core/LogRecord")
-local Sink = require("../core/Sink")
+local LogRecord = require("@root/core/LogRecord")
+local Sink = require("@root/core/Sink")
 
 local function createCallbackSink(callback: (record: LogRecord.LogRecord) -> ()): Sink.Sink
 	return {

@@ -10,12 +10,12 @@
 	destructured freely: `local info = logger.info`.
 ]]
 
-local LogLevel = require("./LogLevel")
-local LogMode = require("./LogMode")
-local LogRecord = require("./LogRecord")
-local Sink = require("./Sink")
-local createDispatcher = require("./createDispatcher")
-local types = require("../platform/types")
+local LogLevel = require("@root/core/LogLevel")
+local LogMode = require("@root/core/LogMode")
+local LogRecord = require("@root/core/LogRecord")
+local Sink = require("@root/core/Sink")
+local createDispatcher = require("@root/core/createDispatcher")
+local types = require("@root/platform/types")
 
 type LogLevelT = types.LogLevel
 type LogModeT = LogMode.LogMode

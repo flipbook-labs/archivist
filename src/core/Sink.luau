@@ -7,7 +7,7 @@
 	write / one HTTP request per batch rather than per record).
 ]]
 
-local LogRecord = require("./LogRecord")
+local LogRecord = require("@root/core/LogRecord")
 
 export type Sink = {
 	write: (records: { LogRecord.LogRecord }) -> (),

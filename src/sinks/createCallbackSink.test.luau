@@ -1,9 +1,9 @@
 local expect = require("@std/test/assert")
 local test = require("@std/test")
 
-local LogLevel = require("../core/LogLevel")
-local LogRecord = require("../core/LogRecord")
-local createCallbackSink = require("./createCallbackSink")
+local LogLevel = require("@root/core/LogLevel")
+local LogRecord = require("@root/core/LogRecord")
+local createCallbackSink = require("@root/sinks/createCallbackSink")
 
 local function record(message: string): LogRecord.LogRecord
 	return {

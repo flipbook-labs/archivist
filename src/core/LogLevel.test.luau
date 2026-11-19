@@ -1,7 +1,7 @@
 local expect = require("@std/test/assert")
 local test = require("@std/test")
 
-local LogLevel = require("./LogLevel")
+local LogLevel = require("@root/core/LogLevel")
 
 test.suite("LogLevel.shouldLog", function(suite)
 	suite:case("emits records at or above the minimum level", function()

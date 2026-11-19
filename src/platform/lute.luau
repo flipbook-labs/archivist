@@ -14,7 +14,7 @@ local process = require("@std/process")
 local richterm = require("@lpm/batteries@v1.0.1-nightly.20261115/richterm")
 local task = require("@std/task")
 
-local types = require("./types")
+local types = require("@root/platform/types")
 
 -- richterm formatters take an extra optional `nocolor` argument, so they don't
 -- match `Styler` exactly under strict analysis; adapt them.

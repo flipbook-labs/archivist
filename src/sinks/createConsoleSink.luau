@@ -9,12 +9,12 @@
 	mode.
 ]]
 
-local Formatter = require("../core/Formatter")
-local LogLevel = require("../core/LogLevel")
-local LogRecord = require("../core/LogRecord")
-local Sink = require("../core/Sink")
-local createPrettyFormatter = require("../formatters/createPrettyFormatter")
-local types = require("../platform/types")
+local Formatter = require("@root/core/Formatter")
+local LogLevel = require("@root/core/LogLevel")
+local LogRecord = require("@root/core/LogRecord")
+local Sink = require("@root/core/Sink")
+local createPrettyFormatter = require("@root/formatters/createPrettyFormatter")
+local types = require("@root/platform/types")
 
 export type ConsoleSinkOptions = {
 	-- Defaults to a PrettyFormatter colored per the platform's capability.

@@ -5,7 +5,7 @@
 	A record is emitted when its severity is >= the logger's minimum level.
 ]]
 
-local types = require("../platform/types")
+local types = require("@root/platform/types")
 
 export type LogLevel = types.LogLevel
 

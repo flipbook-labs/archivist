@@ -5,7 +5,7 @@
 	strings until a formatter renders one.
 ]]
 
-local types = require("../platform/types")
+local types = require("@root/platform/types")
 
 -- The result of `table.pack(...)`: the log call's arguments plus their count
 -- (`n` matters because the varargs may contain nils).

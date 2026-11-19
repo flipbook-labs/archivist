@@ -15,9 +15,9 @@
 	beats a crashing logger.
 ]]
 
-local Formatter = require("../core/Formatter")
-local LogRecord = require("../core/LogRecord")
-local types = require("../platform/types")
+local Formatter = require("@root/core/Formatter")
+local LogRecord = require("@root/core/LogRecord")
+local types = require("@root/platform/types")
 
 export type JsonFormatterOptions = {
 	-- Include the raw args array alongside the joined message when any
