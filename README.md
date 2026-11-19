@@ -31,6 +31,8 @@ archivist = {
 
 Then run `lute pkg install`. Lute installs Archivist into `~/.loom/store` and records the folder as `installPath` in `pkg.lock.luau`, with `@pkg/` standing for `~/.loom/store/`. Point an alias in your `.config.luau` at that folder to require it.
 
+If you vendor Archivist with `lute pkg install --vendor`, also define a `batteries` alias pointing at your own copy of Lute's batteries, under the `batteries` dependency key. A vendored package takes its dependency aliases from your config, and Archivist requires `@batteries`. You can drop that hand-written alias once Lute resolves dependencies from the lockfile.
+
 ### Roblox (Wally)
 
 ```toml
