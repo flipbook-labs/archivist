@@ -1,7 +1,7 @@
 return {
 	package = {
 		name = "Archivist",
-		version = "0.3.0",
+		version = "0.3.1",
 		-- What a consumer gets when installing Archivist. `/src/**` skips
 		-- dotfiles, so `src/.config.luau` has to be named to ship. Specs
 		-- (`*.test.luau`) and the helpers in `src/testing` are only for this
