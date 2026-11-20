@@ -9,7 +9,7 @@
 -- processing; those files are deleted immediately after, so nothing broken
 -- reaches the shipped model.
 --
---   src ──darklua──▶ dist ──(swap seam, drop lute, tests and .config)──▶ rojo ──▶ Archivist.rbxm
+--   src ──darklua──▶ dist ──(swap seam, drop lute and tests)──▶ rojo ──▶ Archivist.rbxm
 --
 -- Run with: lute run build
 local fs = require("@std/fs")
@@ -44,13 +44,7 @@ for path in fs.walk(project.BUILD_PATH, { recursive = true }) do
 end
 fs.removeDirectory(`{project.BUILD_PATH}/testing`, { recursive = true })
 
--- 5. `src/.config.luau` tells Lute where `@root` points, so a vendored copy of
---    Archivist finds its own modules. The Roblox build doesn't need it, since
---    darklua has already turned those requires into `script` paths, and Rojo
---    would otherwise ship it as a ModuleScript named `.config`.
-fs.remove(`{project.BUILD_PATH}/.config.luau`)
-
--- 6. Package the Roblox model.
+-- 5. Package the Roblox model.
 run({ "rojo", "build", "default.project.json", "-o", project.MODEL_FILENAME })
 
 print(`built {project.MODEL_FILENAME}`)
