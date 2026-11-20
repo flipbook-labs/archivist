@@ -4,11 +4,12 @@
 -- sourcemap, so the sourcemap and the processed tree must be the same (`src`).
 -- We therefore transpile `src` as-is and then post-process `dist` to realise the
 -- platform seam: drop the Lute-only module and point `platform/init` at the
--- Roblox implementation. darklua warns about the unresolved `@std/*` requires in
--- `platform/lute.luau` while processing; that file is deleted immediately after,
--- so nothing broken reaches the shipped model.
+-- Roblox implementation. darklua warns about the unresolved `@std` and `@lpm`
+-- requires in `platform/lute.luau`, the specs and the test helpers while
+-- processing; those files are deleted immediately after, so nothing broken
+-- reaches the shipped model.
 --
---   src ──darklua──▶ dist ──(swap seam, drop lute, drop tests)──▶ rojo ──▶ Archivist.rbxm
+--   src ──darklua──▶ dist ──(swap seam, drop lute and tests)──▶ rojo ──▶ Archivist.rbxm
 --
 -- Run with: lute run build
 local fs = require("@std/fs")

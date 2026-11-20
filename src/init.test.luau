@@ -1,7 +1,7 @@
 local expect = require("@std/test/assert")
 local test = require("@std/test")
 
-local Archivist = require("@root")
+local Archivist = require("@repo/src")
 
 test.suite("Archivist", function(suite)
 	suite:case("applies middleware to the default console sink", function()

@@ -5,3 +5,4 @@
 *.rbxm
 *.lock.luau
 package.zip
+/.lpm/

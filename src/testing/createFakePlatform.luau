@@ -14,7 +14,7 @@
 ]]
 
 local json = require("@std/json")
-local pp = require("@batteries/pp")
+local pp = require("@lpm/batteries@v1.0.1-nightly.20261115/pp")
 
 local types = require("@root/platform/types")
 
