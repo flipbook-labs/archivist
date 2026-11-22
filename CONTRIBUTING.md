@@ -16,8 +16,8 @@ lute run install   # vendor dependencies into .lpm/
 lute run example   # run the demo script under Lute
 lute test          # run the test suite
 lute run lint      # check formatting and lint rules
-lute run analyze   # run Luau type analysis
 lute run build     # build the Roblox model (Archivist.rbxm)
+lute run analyze   # run Luau type analysis; needs the build above
 ```
 
 Tests are `*.test.luau` files next to the code they cover.
