@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 
 
+## v0.3.1
+
+Changes 2
+
+### Changes
+
+1. <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-packages-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-packages-light.svg"><img src="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-packages-light.png" alt="Packages" height="18" align="texttop"></picture> Projects using Archivist install it with `lute pkg install --vendor` and add `lpm = "./.lpm"` to `.config.luau`. ([#16](https://github.com/flipbook-labs/archivist/pull/16))
+2. <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-docs-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-docs-light.svg"><img src="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-docs-light.png" alt="Docs" height="18" align="texttop"></picture> Rewrite the README with install steps for Wally and Lute and a runnable example. ([#18](https://github.com/flipbook-labs/archivist/pull/18))
+
+
 ## v0.3.0
 
 Changes 1 · Internal 2

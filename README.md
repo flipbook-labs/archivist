@@ -8,14 +8,14 @@ For Roblox, with Wally:
 
 ```toml
 [dependencies]
-Archivist = "flipbook-labs/archivist@0.3.0"
+Archivist = "flipbook-labs/archivist@0.3.1"
 ```
 
 For Lute, add this to the `dependencies` table in `pkg.luau`, then run `lute pkg install --vendor`:
 
 ```luau
 ["archivist"] = {
-	rev = "v0.3.0",
+	rev = "v0.3.1",
 	sourceKind = "github",
 	source = "https://github.com/flipbook-labs/archivist",
 },
@@ -32,7 +32,7 @@ local logger = Archivist.createLogger("MyModule")
 logger.info("loaded", 3, "stories")
 ```
 
-On Lute, the console prints `[info] loaded 3 stories`, and you require the vendored copy as `@lpm/archivist@v0.3.0` instead of `@pkg/Archivist`.
+On Lute, the console prints `[info] loaded 3 stories`, and you require the vendored copy as `@lpm/archivist@v0.3.1` instead of `@pkg/Archivist`.
 
 `Archivist.getLogger(name)` returns the same logger for a given name, so modules can share one configured logger. Later calls with that name ignore their options.
 
