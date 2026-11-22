@@ -1,81 +1,82 @@
 # Archivist
 
-A structured logging library for Luau that runs on both [Lute](https://github.com/luau-lang/lute) and Roblox.
+Archivist is a structured logging library for Luau that runs on both [Lute](https://github.com/luau-lang/lute) and Roblox. Each log call produces a record that sinks send to the console, a file, or your own callback. Archivist is pre-release, and its API may change before v1.
 
-> [!NOTE]
-> Archivist is pre-release and under active development. The API may change before v1.
+## Install
 
-## Features
+For Roblox, with Wally:
 
-- **Dual runtime**: one library, first-class support for Lute (CLI) and Roblox
-- **Log levels**: `trace`, `debug`, `info`, `warn`, `err`, filtered by a minimum level
-- **`LOG_LEVEL`**: level resolution from the environment on Lute, `_G.LOG_LEVEL` on Roblox
-- **Colorful output**: ANSI-colored console output on Lute; plain `print`/`warn` on Roblox
-- **Structured records**: every entry is a `LogRecord` object (timestamp, level, name, args) that sinks can consume
-- **Sinks**: route records anywhere: console, files (Lute), or your own callback (e.g. an in-app log viewer)
-- **Dev/prod deferral**: sequential `print`-like output in dev; in prod, records batch and each sink is written once per batch instead of once per record
+```toml
+[dependencies]
+Archivist = "flipbook-labs/archivist@0.3.0"
+```
 
-## Installation
-
-### Lute (Loom)
-
-Add to your `pkg.luau` dependencies:
+For Lute, add this to the `dependencies` table in `pkg.luau`, then run `lute pkg install --vendor`:
 
 ```luau
-archivist = {
+["archivist"] = {
 	rev = "v0.3.0",
 	sourceKind = "github",
 	source = "https://github.com/flipbook-labs/archivist",
 },
 ```
 
-Then run `lute pkg install --vendor`. Lute copies Archivist into `.lpm/archivist@v0.3.0`, with its dependencies in folders beside it, and your code requires it as `@lpm/archivist@v0.3.0`.
+Lute projects also need Lute `1.0.1-nightly.20261117` or newer, and `lpm = "./.lpm"` in the `aliases` table of `.config.luau`. Archivist requires its dependencies through that alias.
 
-> [!NOTE]
-> Projects using Archivist vendor its dependencies with `lute pkg install --vendor` (Lute `1.0.1-nightly.20261117` or newer) and define `lpm = "./.lpm"` in their `.config.luau`, because Archivist requires its dependencies through that alias. [flipbook-labs/flipbook#694](https://github.com/flipbook-labs/flipbook/issues/694) tracks dropping this requirement.
-
-### Roblox (Wally)
-
-```toml
-[dependencies]
-Archivist = "flipbook-labs/archivist@0.1.0"
-```
-
-## Usage
+## Use
 
 ```luau
 local Archivist = require("@pkg/Archivist")
 
 local logger = Archivist.createLogger("MyModule")
-
 logger.info("loaded", 3, "stories")
-logger.info("structured data:", { port = 8080, ready = true })
-logger.warn("something looks off")
-logger.err("something broke")
+```
 
--- Children share the parent's sinks and attach fields to every record:
-local child = logger.child("requests", { requestId = "abc123" })
-child.debug("handling request")
+On Lute, the console prints `[info] loaded 3 stories`, and you require the vendored copy as `@lpm/archivist@v0.3.0` instead of `@pkg/Archivist`.
 
--- Prod mode batches: these queue and flush to each sink as ONE write.
-local batched = Archivist.createLogger("Telemetry", { mode = "Prod" })
-batched.info("queued 1")
-batched.info("queued 2")
-batched.flush() -- optional; pending batches also flush on defer and at exit
+`Archivist.getLogger(name)` returns the same logger for a given name, so modules can share one configured logger. Later calls with that name ignore their options.
 
--- Show everything, regardless of LOG_LEVEL:
+## Levels
+
+The levels, in ascending order, are `trace`, `debug`, `info`, `warn`, and `err`. A logger drops records below its minimum level. The minimum comes from the first of these that is set: the `level` option, the `LOG_LEVEL` environment variable on Lute, `_G.LOG_LEVEL` on Roblox, and then `info`.
+
+The `level` option takes the capitalized name, as in `"Trace"`:
+
+```luau
 local verbose = Archivist.createLogger("MyModule", { level = "Trace" })
 ```
 
-### Pretty output middleware
+## Child loggers
 
-The default console formatter emits the level and message:
+`logger.child(name, fields)` returns a logger that copies its parent's sinks, level, and mode. Its name joins the parent's name with `/`, and its fields go on every record:
 
-```text
-[info] loaded 3 stories
+```luau
+local request = logger.child("requests", { requestId = "abc123" })
+request.info("handling request")
 ```
 
-Add the built-in middleware when you want logger names or timestamps:
+## Sinks
+
+Without a `sinks` option, a logger writes to one console sink. Pass `sinks` to choose the destinations:
+
+```luau
+local logger = Archivist.createLogger("App", {
+	sinks = {
+		Archivist.createConsoleSink(),
+		Archivist.createCallbackSink(function(record)
+			print(record.level, record.name)
+		end),
+	},
+})
+```
+
+- `createCallbackSink(callback)` calls `callback` with each record, one at a time, even in prod mode.
+- `createFileSink({ path })` appends one JSON object per line to a file. It is Lute only, and it errors on Roblox.
+- `createTransportSink({ batchSize, send })` buffers records and calls `send` with each batch. `batchSize` defaults to 50. `send` uses your own HTTP client.
+
+## Formatters
+
+The console sink formats each record as `[level] message`. The built-in middleware adds logger names or timestamps to that line:
 
 ```luau
 local logger = Archivist.createLogger("MyModule", {
@@ -86,69 +87,27 @@ local logger = Archivist.createLogger("MyModule", {
 })
 ```
 
-Middleware runs in declaration order. Each function receives the formatted line and a context containing the structured record, platform, color setting, and a color-aware `style` helper. It can prepend, append, or replace text.
-
-The logger-level `middleware` option configures its default console sink. When you provide `sinks`, pass middleware to the pretty formatter instead:
+Middleware runs in the order listed. Each function receives the formatted line and a context table, and returns the line to print. The `middleware` option applies only when Archivist creates the console sink. With your own `sinks`, put middleware on a formatter instead:
 
 ```luau
 local formatter = Archivist.createPrettyFormatter({
-	middleware = {
-		Archivist.middleware.name,
-	},
+	middleware = { Archivist.middleware.name },
 })
 local logger = Archivist.createLogger("MyModule", {
-	sinks = {
-		Archivist.createConsoleSink({ formatter = formatter }),
-	},
+	sinks = { Archivist.createConsoleSink({ formatter = formatter }) },
 })
 ```
 
-### Sinks
+`createJsonFormatter()` writes one JSON object per line. File sinks use it by default.
 
-```luau
-local logger = Archivist.createLogger("App", {
-	sinks = {
-		-- The runtime's console: colored stdout on Lute, print/warn on Roblox.
-		Archivist.createConsoleSink(),
+## Prod mode
 
-		-- Any custom destination, e.g. an in-app log viewer panel:
-		Archivist.createCallbackSink(function(record)
-			LogsStore.addLine(record)
-		end),
+Loggers default to dev mode, where each call writes right away, like `print`. Set `mode = "Prod"` to queue records and write each sink once per batch. Call `logger.flush()` before a short-lived program exits, so queued records reach the sinks.
 
-		-- A JSON-lines log file (Lute only):
-		Archivist.createFileSink({ path = "logs/app.log" }),
+## Contributing
 
-		-- Ship batches to an external platform; bring your own HTTP client:
-		Archivist.createTransportSink({
-			batchSize = 50,
-			send = function(records)
-				httpClient.post(INGEST_URL, records)
-			end,
-		}),
-	},
-})
-```
-
-Formatters control how text-oriented sinks render records: `createPrettyFormatter` (human-readable, optional ANSI color and middleware) and `createJsonFormatter` (one JSON object per line). Sinks that consume records structurally (`createCallbackSink`, `createTransportSink`) bypass formatting entirely.
-
-The minimum level resolves from, in order: the `level` option, the `LOG_LEVEL`
-environment variable (Lute), `_G.LOG_LEVEL` (Roblox), then defaults to `info`.
-
-`Archivist.getLogger(name)` returns a per-name cached logger so modules can
-share one configured logger without threading it through requires.
-
-## Development
-
-Archivist uses [Rokit](https://github.com/rojo-rbx/rokit) for toolchain management.
-
-```sh
-rokit install
-lute run example   # run the demo script under Lute
-lute test          # run the unit tests
-lute run build     # build the Roblox model (Archivist.rbxm)
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-[MIT](LICENSE)
+MIT.
