@@ -4,30 +4,32 @@ This folder holds the unreleased changes for the next release. Each file describ
 
 ## Adding an entry
 
-Create a Markdown file in this folder, named after the change, such as `fix-release-permissions.md`:
+Create a Luau file in this folder that returns the entry's fields. The filename only exists to make entries easy to browse, so name it after the change, such as `fix-release-permissions.luau`:
 
-```markdown
----
-bump: minor
-category: Features
-kind: sinks
----
-
-Add support for Foo values so Bar can be Bazzed.
+```luau
+return {
+	bump = "minor",
+	category = "Features",
+	kind = "sinks",
+	summary = "Add support for Foo values so Bar can be Bazzed.",
+}
 ```
 
-- **`bump`** (required) — how much to move the version: `major`, `minor`, or `patch`.
-- **`category`** (required) — the heading this entry appears under in the changelog: `Features`, `Changes`, `Fixes`, `Dependencies`, or `Internal`. The changelog lists the headings in that order, as set by `categories` in [`changewrite.toml`](../changewrite.toml). Dependencies and Internal start collapsed in GitHub release notes.
-- **`kind`** (required) — the part of Archivist the change landed in, shown as a chip beside the entry. Pick one of the kinds under `[kind]` in [`changewrite.toml`](../changewrite.toml): `logging`, `sinks`, `formatters`, `docs`, `build`, `tooling`, `packages`, `ci`, `release`, or `contributing`. A refactor takes the kind of whatever it touches.
-- **`highlight`** (optional) — a short title for a change worth a headline. The entry's full body appears under Highlights at the top of the release notes.
-- **Body** — everything below the frontmatter is the changelog text. Aim for one short sentence.
+- **`bump`** (required): how much to move the version, `"major"`, `"minor"`, or `"patch"`.
+- **`category`** (required): the heading this entry appears under in the changelog, one of `Features`, `Changes`, `Fixes`, `Dependencies`, or `Internal`. The changelog lists the headings in that order, as set by `categories` in [`changewrite.luau`](../changewrite.luau). Dependencies and Internal start collapsed in GitHub release notes.
+- **`kind`** (required): the part of Archivist the change landed in, shown as a chip beside the entry. Pick one of the `kind` keys in [`changewrite.luau`](../changewrite.luau): `logging`, `sinks`, `formatters`, `docs`, `build`, `tooling`, `packages`, `ci`, `release`, or `contributing`. A refactor takes the kind of whatever it touches.
+- **`summary`** (required): the changelog line, one short sentence of at most 140 characters, written for someone reading the changelog without the pull request.
+- **`highlight`** (optional): a short title for a change worth a headline. The entry's summary and body appear under Highlights at the top of the release notes.
+- **`body`** (optional): more detail in Markdown, shown collapsed under the summary.
+
+`changewrite check` fails on any other Markdown file in this folder. `changewrite check --fix` converts Markdown entries to Luau.
 
 An optional `release.md` in this folder opens the next release's notes with a one- or two-sentence summary of what it brings. Changewrite consumes it with the entries.
 
-After changing the kinds in `changewrite.toml`, run `changewrite generate` and commit the chip images it writes to `assets/`.
+After changing the kinds in `changewrite.luau`, run `changewrite generate` and commit the chip images it writes to `assets/`.
 
 ## How the version is chosen
 
 The next version is the largest bump across all pending entries: a single `major` entry makes the release a major, otherwise a single `minor` makes it a minor, otherwise it is a `patch`.
 
-`README.md` is ignored, so it is safe to keep here.
+`README.md` and the `assets/` folder are ignored, so they are safe to keep here.
