@@ -2,7 +2,7 @@ return {
 	categories = { "Features", "Changes", "Fixes", "Dependencies", "Internal" },
 	collapsed = { "Dependencies", "Internal" },
 	version = {
-		current = "0.3.1",
+		current = "0.3.2",
 		mirror = {
 			{ file = "wally.toml" },
 			{ file = "pkg.luau" },

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.3.2
+
+Internal 2
+
+### Internal
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-tooling-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-tooling-light.svg" /><img src="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-tooling-light.png" alt="Tooling" height="18" align="texttop" /></picture> Move to Changewrite v0.16.0 and AgentSkills v0.9.0. ([#21](https://github.com/flipbook-labs/archivist/pull/21))
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-release-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-release-light.svg" /><img src="https://raw.githubusercontent.com/flipbook-labs/archivist/main/.changes/assets/kind-release-light.png" alt="Release" height="18" align="texttop" /></picture> Record each Wally publish as a deployment to the `wally` environment. ([#23](https://github.com/flipbook-labs/archivist/pull/23))
 
 ## v0.3.1
 
